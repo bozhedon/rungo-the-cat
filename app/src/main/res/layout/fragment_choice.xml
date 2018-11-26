@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/whiteOverlay">
+
+    <ImageView
+            android:id="@+id/choice_challenge_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="19dp"
+            app:srcCompat="@drawable/ic_play_challenge"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+            android:id="@+id/choice_training_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="11dp"
+            app:srcCompat="@drawable/ic_play_training"
+            app:layout_constraintBottom_toTopOf="@+id/choice_challenge_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+            android:id="@+id/choice_challenge_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#828282"
+            android:textStyle="bold"
+            android:text="@string/play_challenge"
+            app:layout_constraintBottom_toBottomOf="@+id/choice_challenge_button"
+            app:layout_constraintTop_toTopOf="@+id/choice_challenge_button"
+            app:layout_constraintStart_toEndOf="@+id/choice_challenge_button"/>
+
+    <TextView
+            android:id="@+id/choice_training_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginStart="10dp"
+            android:textColor="#828282"
+            android:textStyle="bold"
+            android:text="@string/play_training"
+            app:layout_constraintBottom_toBottomOf="@+id/choice_training_button"
+            app:layout_constraintTop_toTopOf="@+id/choice_training_button"
+            app:layout_constraintStart_toEndOf="@+id/choice_challenge_button"/>
+
+</android.support.constraint.ConstraintLayout>

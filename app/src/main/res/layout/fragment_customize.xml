@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <android.support.constraint.ConstraintLayout
+                android:id="@+id/custom_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <TextView
+                    android:id="@+id/custom_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="36dp"
+                    android:layout_marginTop="28dp"
+                    android:textSize="18sp"
+                    android:textColor="#828282"
+                    android:textStyle="bold"
+                    android:text="@string/choose_clothes"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            <ImageView
+                    android:id="@+id/custom_cat_image"
+                    android:layout_width="153dp"
+                    android:layout_height="153dp"
+                    android:layout_marginTop="31dp"
+                    android:scaleType="centerInside"
+                    tools:src="@drawable/bad_cat"
+                    app:layout_constraintTop_toBottomOf="@+id/custom_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"/>
+
+            <ImageView
+                    android:layout_width="69dp"
+                    android:layout_height="15dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/ic_cat_shadow"
+                    app:layout_constraintTop_toBottomOf="@+id/custom_cat_image"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/custom_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="29dp"
+                    android:background="@color/white"
+                    app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                    app:spanCount="2"
+                    app:layout_constraintTop_toBottomOf="@+id/custom_cat_image"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:listitem="@layout/item_skin"/>
+
+            <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="48dp"
+                    android:paddingTop="33dp"
+                    android:paddingBottom="27dp"
+                    android:background="@color/white"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/custom_recycler_view"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.0">
+
+                <LinearLayout
+                        android:id="@+id/custom_check_button"
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+
+                    <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/ic_check"/>
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="9dp"
+                            android:layout_gravity="center_vertical"
+                            android:textColor="#828282"
+                            android:textStyle="bold"
+                            android:text="@string/custom_check"/>
+
+                </LinearLayout>
+            </FrameLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <ProgressBar
+                android:id="@+id/custom_progress"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+    </FrameLayout>
+</ScrollView>

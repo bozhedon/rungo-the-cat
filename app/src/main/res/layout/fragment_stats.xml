@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+            android:id="@+id/stats_this_time_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="17dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            tools:text="@string/stats_this_week"
+            app:layout_constraintEnd_toStartOf="@+id/stats_last_time_title"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+            android:id="@+id/stats_last_time_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            tools:text="@string/stats_last_week"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/stats_distance"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/stats_this_time_distance"
+            app:layout_constraintEnd_toStartOf="@+id/stats_this_time_title"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toBottomOf="@+id/stats_this_time_distance"/>
+
+    <TextView
+            android:id="@+id/stats_this_time_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="30"
+            app:layout_constraintStart_toStartOf="@+id/stats_this_time_title"
+            app:layout_constraintTop_toBottomOf="@+id/stats_this_time_title"
+            app:layout_constraintEnd_toEndOf="@+id/stats_this_time_title"/>
+
+    <TextView
+            android:id="@+id/stats_last_time_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            tools:text="30"
+            app:layout_constraintEnd_toEndOf="@+id/stats_last_time_title"
+            app:layout_constraintTop_toBottomOf="@+id/stats_last_time_title"
+            app:layout_constraintStart_toStartOf="@+id/stats_last_time_title"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            android:text="@string/stats_training"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/stats_this_time_title"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toTopOf="@+id/stats_this_time_trainings"
+            app:layout_constraintBottom_toBottomOf="@+id/stats_this_time_trainings"/>
+
+    <TextView
+            android:id="@+id/stats_this_time_trainings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="3"
+            app:layout_constraintEnd_toEndOf="@+id/stats_this_time_title"
+            app:layout_constraintStart_toStartOf="@+id/stats_this_time_title"
+            app:layout_constraintTop_toBottomOf="@+id/stats_this_time_distance"/>
+
+    <TextView
+            android:id="@+id/stats_last_time_trainings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            tools:text="3"
+            app:layout_constraintEnd_toEndOf="@+id/stats_last_time_title"
+            app:layout_constraintStart_toStartOf="@+id/stats_last_time_title"
+            app:layout_constraintTop_toBottomOf="@+id/stats_last_time_distance"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/stats_avg_speed"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/stats_this_time_avg_speed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/stats_this_time_title"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toTopOf="@+id/stats_this_time_avg_speed"/>
+
+    <TextView
+            android:id="@+id/stats_this_time_avg_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="36dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="5.3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/stats_this_time_title"
+            app:layout_constraintStart_toStartOf="@+id/stats_this_time_title"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/stats_this_time_trainings"
+            app:layout_constraintHorizontal_bias="0.51"/>
+
+    <TextView
+            android:id="@+id/stats_last_time_avg_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="36dp"
+            android:textColor="#828282"
+            android:textSize="14sp"
+            tools:text="5.3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/stats_last_time_title"
+            app:layout_constraintStart_toStartOf="@+id/stats_last_time_title"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/stats_last_time_trainings"/>
+
+</android.support.constraint.ConstraintLayout>

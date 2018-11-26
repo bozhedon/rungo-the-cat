@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">RunGo</string>
+    <string name="play_challenge">Выбрать вызов</string>
+    <string name="play_training">Без вызова</string>
+    <string name="choose_clothes">Выбери одежду</string>
+    <string name="custom_check">Одеть</string>
+    <string name="good_choice">Отличный выбор!</string>
+    <string name="choose_challenge">Выбери вызов</string>
+    <string name="get_award">получи</string>
+    <string name="week">Неделя</string>
+    <string name="month">Месяц</string>
+    <string name="year">Год</string>
+    <string name="stats_this_week">эта неделя</string>
+    <string name="stats_last_week">прошлая неделя</string>
+    <string name="stats_this_month">этот месяц</string>
+    <string name="stats_last_month">прошлый месяц</string>
+    <string name="stats_this_year">этот год</string>
+    <string name="stats_last_year">прошлый год</string>
+    <string name="stats_distance">Расстояние\n(км)</string>
+    <string name="stats_training">Тренировки</string>
+    <string name="stats_avg_speed">Сред. скорость\n(км/ч)</string>
+</resources>

@@ -1,0 +1,20 @@
+<resources>
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@drawable/default_background</item>
+    </style>
+
+    <style name="AppTheme.Splash" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
+    <style name="ProgressDialogTheme" parent="ThemeOverlay.AppCompat.Dialog">
+        <item name="android:windowBackground">@color/transparent</item>
+    </style>
+
+    <style name="OverlayTheme" parent="AppTheme">
+        <item name="android:windowBackground">@color/transparent</item>
+    </style>
+</resources>

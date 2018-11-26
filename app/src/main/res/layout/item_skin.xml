@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="103dp">
+
+    <ImageView
+            android:id="@+id/item_skin_image"
+            android:layout_width="112dp"
+            android:layout_height="103dp"
+            android:layout_gravity="center_horizontal"
+            android:padding="20dp"
+            android:background="@drawable/ic_suit_background"
+            android:src="@drawable/bad_cat_jacket"/>
+
+    <ImageView
+            android:id="@+id/item_skin_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_block_orange_60dp"/>
+
+</FrameLayout>
