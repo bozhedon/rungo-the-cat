@@ -30,7 +30,6 @@ class ChallengeAcceptFragment : DialogFragment(), ChallengeAcceptView {
         mvpDelegate.onAttach()
         setStyle(STYLE_NORMAL, R.style.OverlayTheme)
         isCancelable = true
-        isCancelable = true
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
@@ -38,6 +37,9 @@ class ChallengeAcceptFragment : DialogFragment(), ChallengeAcceptView {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        view?.setOnClickListener { dismiss() }
+        challenge_accept_card.setOnClickListener { }
+        challenge_cancel_button.setOnClickListener { dismiss() }
         challenge_accept_button.setOnClickListener { presenter.accept() }
         challenge_distance_text.text = arguments?.getString(ARG_DISTANCE)
         challenge_time_text.text = arguments?.getString(ARG_TIME)

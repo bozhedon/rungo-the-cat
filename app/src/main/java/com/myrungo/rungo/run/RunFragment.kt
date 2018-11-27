@@ -34,7 +34,9 @@ class RunFragment : BaseFragment(), RunView {
     }
 
     override fun run(isRun: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (isRun) {
+
+        }
     }
 
     override fun onBackPressed() {
