@@ -19,4 +19,22 @@
     <string name="stats_distance">Расстояние\n(км)</string>
     <string name="stats_training">Тренировки</string>
     <string name="stats_avg_speed">Сред. скорость\n(км/ч)</string>
+    <string name="distance">%d км</string>
+    <string name="welcome_title">Давайте знакомиться</string>
+
+    <string name="running">Идёт пробежка</string>
+    <string name="notification">Макс. скорость : %1$s, Пройдено : %2$s.</string>
+    <string name="noti_id" translatable="false">StepsV2id</string>
+    <string name="custom_frag_title">Выбери одежду</string>
+    <string name="distance_gone">Пройдено</string>
+    <string name="unknown_error_has_occured">Произошла неизвестная ошибка</string>
+    <string name="no_internet_connection">Подключение к Интернету отсутствует</string>
+    <string name="play_services_update_cancelled">Обновление Play Services прервано</string>
+    <string name="developer_error">Ошибка разработчика</string>
+    <string name="provider_error">Ошибка провайдера</string>
+    <string name="user_account_merge_conflict">Конфликт с слиянием учетной записи пользователя</string>
+    <string name="you_are_attempting_to_sign_in_a_different_email_than_previously_provided">Вы пытаетесь войти в другое электронное письмо, чем ранее</string>
+    <string name="swipe_from_up_to_down">Свайпните сверху вниз</string>
+    <string name="you_do_not_have_any_costume">Вы ещё не получили ни одного костюма :(</string>
+    <string name="zero_time">00:00:00</string>
 </resources>

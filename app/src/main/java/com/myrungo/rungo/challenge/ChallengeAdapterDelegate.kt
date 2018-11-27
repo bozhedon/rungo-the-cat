@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.hannesdorfmann.adapterdelegates3.AdapterDelegate
 import com.myrungo.rungo.R
 import com.myrungo.rungo.inflate
+import com.myrungo.rungo.toDate
 import kotlinx.android.synthetic.main.item_challenge.view.*
 
 class ChallengeAdapterDelegate(private val clickListener: (ChallengeItem) -> Unit = {}) : AdapterDelegate<MutableList<Any>>() {
@@ -34,9 +35,12 @@ class ChallengeAdapterDelegate(private val clickListener: (ChallengeItem) -> Uni
         fun bind(challenge: ChallengeItem) {
             this.challenge = challenge
 
+            val h = challenge.time / 100
+            val m = challenge.time % 100
+
             with(itemView) {
-                item_challenge_distance.text = challenge.distance
-                item_challenge_time.text = challenge.time
+                item_challenge_distance.text = context.getString(R.string.distance, challenge.distance)
+                item_challenge_time.text = "$h:$m"
 
                 Glide.with(this)
                     .load(challenge.awardRes)

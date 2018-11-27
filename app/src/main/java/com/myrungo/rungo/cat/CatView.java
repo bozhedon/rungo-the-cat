@@ -32,7 +32,6 @@ public class CatView extends ConstraintLayout {
     private ImageView eyeLeft;
 
     private Heads currentHead;
-    private Animation.AnimationListener animationListener = null;
 
     public CatView(Context context) {
         super(context);
@@ -47,10 +46,6 @@ public class CatView extends ConstraintLayout {
     public CatView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
-    }
-
-    public void setAnimationListener(Animation.AnimationListener animationListener) {
-        this.animationListener = animationListener;
     }
 
     private void init() {
@@ -110,6 +105,7 @@ public class CatView extends ConstraintLayout {
     public void setSkin(Skins skin) {
         switch (skin) {
             case COMMON:
+                setHead(Heads.COMMON);
                 Glide.with(this).load(R.drawable.common_cat_body).into(body);
                 Glide.with(this).load(R.drawable.common_cat_hand).into(handRight);
                 Glide.with(this).load(R.drawable.common_cat_hand_left).into(handLeft);
@@ -118,6 +114,7 @@ public class CatView extends ConstraintLayout {
                 break;
 
             case BAD:
+                setHead(Heads.ANGRY);
                 Glide.with(this).load(R.drawable.bad_cat_body).into(body);
                 Glide.with(this).load(R.drawable.bad_cat_hand).into(handRight);
                 Glide.with(this).load(R.drawable.bad_cat_hand_left).into(handLeft);
@@ -126,6 +123,7 @@ public class CatView extends ConstraintLayout {
                 break;
 
             case BUSINESS:
+                setHead(Heads.COMMON);
                 Glide.with(this).load(R.drawable.bussiness_cat_body).into(body);
                 Glide.with(this).load(R.drawable.bussiness_cat_hand).into(handRight);
                 Glide.with(this).load(R.drawable.bussiness_cat_hand_left).into(handLeft);
@@ -134,6 +132,7 @@ public class CatView extends ConstraintLayout {
                 break;
 
             case KARATE:
+                setHead(Heads.COMMON);
                 Glide.with(this).load(R.drawable.karate_cat_body).into(body);
                 Glide.with(this).load(R.drawable.karate_cat_hand).into(handRight);
                 Glide.with(this).load(R.drawable.karate_cat_hand_left).into(handLeft);
@@ -142,6 +141,7 @@ public class CatView extends ConstraintLayout {
                 break;
 
             case NORMAL:
+                setHead(Heads.COMMON);
                 Glide.with(this).load(R.drawable.normal_cat_body).into(body);
                 Glide.with(this).load(R.drawable.normal_cat_hand).into(handRight);
                 Glide.with(this).load(R.drawable.normal_cat_hand_left).into(handLeft);
@@ -346,21 +346,6 @@ public class CatView extends ConstraintLayout {
         headAnimation.setRepeatMode(ValueAnimator.REVERSE);
         headAnimation.setRepeatCount(1);
         headAnimation.setFillAfter(true);
-        headAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                if (animationListener != null) animationListener.onAnimationStart(animation);
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if (animationListener != null) animationListener.onAnimationEnd(animation);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
 
         Animation handLeftAnimation = new RotateAnimation(0, 60, handWidth, -10);
         handLeftAnimation.setDuration(400);

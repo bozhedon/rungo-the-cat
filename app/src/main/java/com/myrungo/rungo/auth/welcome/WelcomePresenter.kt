@@ -1,9 +1,9 @@
-package com.myrungo.rungo.profile.stats
+package com.myrungo.rungo.auth.welcome
 
 import com.arellomobile.mvp.InjectViewState
 import com.myrungo.rungo.BasePresenter
 
 @InjectViewState
-class StatsPresenter : BasePresenter<StatsView>() {
+class WelcomePresenter : BasePresenter<WelcomeView>() {
 
 }

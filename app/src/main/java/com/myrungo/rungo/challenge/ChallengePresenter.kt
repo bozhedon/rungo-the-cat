@@ -20,10 +20,9 @@ class ChallengePresenter @Inject constructor(
         viewState.showData(
             listOf(
                 HeaderItem(resourceManager.getString(R.string.choose_challenge)),
-                ChallengeItem(0, "5 км", "00:30", R.drawable.bad_cat_jacket),
-                ChallengeItem(1, "10 км", "00:40", R.drawable.bussiness_cat_cloth),
-                ChallengeItem(2, "15 км", "01:30", R.drawable.karate_cat_kimono),
-                ChallengeItem(3, "8 км", "00:40", R.drawable.normal_cat_sportsuniform)
+                ChallengeItem(0, 5, 30, R.drawable.bad_cat_jacket),
+                ChallengeItem(1, 10, 40, R.drawable.bussiness_cat_cloth),
+                ChallengeItem(2, 15, 130, R.drawable.karate_cat_kimono)
             )
         )
     }

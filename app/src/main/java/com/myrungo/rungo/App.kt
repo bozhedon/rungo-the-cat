@@ -3,10 +3,10 @@ package com.myrungo.rungo
 import android.app.Application
 import android.content.Context
 import com.crashlytics.android.Crashlytics
-import com.myrungo.rungo.model.ResourceManager
-import com.myrungo.rungo.model.AppSchedulers
-import com.myrungo.rungo.model.MainNavigationController
-import com.myrungo.rungo.model.SchedulersProvider
+import com.google.gson.Gson
+import com.myrungo.rungo.auth.AuthHolder
+import com.myrungo.rungo.cat.CatController
+import com.myrungo.rungo.model.*
 import com.yandex.metrica.YandexMetrica
 import com.yandex.metrica.YandexMetricaConfig
 import io.fabric.sdk.android.Fabric
@@ -82,6 +82,10 @@ class App : Application() {
                         bind(SchedulersProvider::class.java).toInstance(AppSchedulers())
                         bind(ResourceManager::class.java).singletonInScope()
                         bind(MainNavigationController::class.java).toInstance(MainNavigationController())
+                        bind(CatController::class.java).toInstance(CatController())
+
+                        bind(Gson::class.java).toInstance(Gson())
+                        bind(AuthHolder::class.java).to(Prefs::class.java).singletonInScope()
 
                         val cicerone = Cicerone.create()
                         bind(Router::class.java).toInstance(cicerone.router)

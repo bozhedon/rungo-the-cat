@@ -13,6 +13,7 @@ import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import ru.terrakok.cicerone.commands.Command
 import toothpick.Toothpick
 import javax.inject.Inject
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 class AppActivity : MvpAppCompatActivity(), MvpView {
 
@@ -43,12 +44,19 @@ class AppActivity : MvpAppCompatActivity(), MvpView {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         Toothpick.inject(this, Toothpick.openScope(Scopes.APP))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.app_container)
 
         if (savedInstanceState == null) {
-            presenter.coldStart()
+            val account = GoogleSignIn.getLastSignedInAccount(this)
+
+            if (account != null) {
+                presenter.initMainScreen(account)
+            } else {
+                presenter.initAuthScreen()
+            }
         }
     }
 
@@ -64,5 +72,9 @@ class AppActivity : MvpAppCompatActivity(), MvpView {
 
     override fun onBackPressed() {
         currentFragment?.onBackPressed() ?: super.onBackPressed()
+    }
+
+    companion object {
+        const val RC_SIGN_IN = 1000
     }
 }

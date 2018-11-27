@@ -4,20 +4,33 @@ import com.arellomobile.mvp.InjectViewState
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Screens
+import com.myrungo.rungo.auth.AuthHolder
+import com.myrungo.rungo.cat.CatController
+import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.model.MainNavigationController
 import ru.terrakok.cicerone.Router
+import timber.log.Timber
 import javax.inject.Inject
 
 @InjectViewState
 class CustomizePresenter @Inject constructor(
     private val router: Router,
-    private val navigation: MainNavigationController
+    private val navigation: MainNavigationController,
+    private val authData: AuthHolder,
+    private val catController: CatController
 ) : BasePresenter<CustomizeView>() {
 
     private var skinResId: Int? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+
+        catController.skinState
+            .subscribe(
+                { handleSkin(it) },
+                { Timber.e(it) }
+            )
+            .connect()
 
         viewState.showSkins(
             listOf(
@@ -29,8 +42,24 @@ class CustomizePresenter @Inject constructor(
         )
     }
 
+    private fun handleSkin(skin: CatView.Skins) {
+        viewState.showSkinReference(
+            when (skin) {
+                CatView.Skins.COMMON -> R.drawable.common_cat
+                CatView.Skins.BAD -> R.drawable.bad_cat
+                CatView.Skins.BUSINESS -> R.drawable.bussiness_cat
+                CatView.Skins.KARATE -> R.drawable.karate_cat
+                CatView.Skins.NORMAL -> R.drawable.normal_cat
+            }
+        )
+    }
+
     fun onSelectClicked() {
-        skinResId?.let { router.navigateTo(Screens.CustomizeDone(it)) }
+        skinResId?.let {
+            catController.setSkin(getSkin(it))
+            authData.currentSkin = getSkin(it)
+            router.navigateTo(Screens.CustomizeDone(it))
+        }
     }
 
     fun onSkinClicked(skin: SkinItem) {
@@ -49,6 +78,15 @@ class CustomizePresenter @Inject constructor(
         1 -> R.drawable.bad_cat
         2 -> R.drawable.bussiness_cat
         3 -> R.drawable.karate_cat
-        else -> 0
+        else -> R.drawable.common_cat
+    }
+
+    private fun getSkin(resId: Int) = when (resId) {
+        R.drawable.common_cat -> CatView.Skins.COMMON
+        R.drawable.normal_cat -> CatView.Skins.NORMAL
+        R.drawable.bad_cat -> CatView.Skins.BAD
+        R.drawable.bussiness_cat -> CatView.Skins.BUSINESS
+        R.drawable.karate_cat -> CatView.Skins.KARATE
+        else -> CatView.Skins.COMMON
     }
 }

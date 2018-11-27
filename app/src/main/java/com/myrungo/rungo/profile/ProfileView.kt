@@ -1,9 +1,12 @@
-package com.myrungo.rungo.profile.stats
+package com.myrungo.rungo.profile
 
 import com.arellomobile.mvp.MvpView
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface StatsView : MvpView {
+interface ProfileView : MvpView {
+    fun showCat(resId: Int)
+    fun showDetails(name: String, distance: String)
+    fun showTab(position: Int)
 }

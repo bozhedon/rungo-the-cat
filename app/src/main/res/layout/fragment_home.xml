@@ -11,4 +11,12 @@
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/ic_main_background"/>
 
+    <com.myrungo.rungo.cat.CatView
+            android:id="@+id/cat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical">
+
+    </com.myrungo.rungo.cat.CatView>
+
 </FrameLayout>

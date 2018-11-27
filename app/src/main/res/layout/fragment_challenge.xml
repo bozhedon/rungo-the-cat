@@ -10,6 +10,7 @@
             android:id="@+id/challenge_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:overScrollMode="never"
             android:paddingBottom="47dp"
             android:clipToPadding="false"
             android:orientation="vertical"

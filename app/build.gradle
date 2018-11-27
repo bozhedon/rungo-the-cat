@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 28
@@ -15,6 +17,14 @@ android {
             annotationProcessorOptions {
                 arguments = [toothpick_registry_package_name: 'com.myrungo.rungo']
             }
+        }
+    }
+    signingConfigs {
+        config {
+            keyAlias 'rungo'
+            keyPassword 'rungothecat'
+            storeFile file('/Users/ivan/Desktop/rungo-the-cat/keystore.jks')
+            storePassword 'rungothecat'
         }
     }
     buildTypes {
@@ -53,6 +63,10 @@ dependencies {
     //Google Services
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
+    implementation 'com.google.firebase:firebase-core:16.0.5'
+    implementation 'com.google.firebase:firebase-storage:16.0.5'
+    //Gson
+    implementation("com.google.code.gson:gson:2.8.2")
     //Log
     implementation 'com.jakewharton.timber:timber:4.7.1'
     //Crashlytics
@@ -61,5 +75,5 @@ dependencies {
     implementation 'com.yandex.android:mobmetricalib:3.4.0'
     implementation 'com.android.installreferrer:installreferrer:1.0'
     //Kotlin
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

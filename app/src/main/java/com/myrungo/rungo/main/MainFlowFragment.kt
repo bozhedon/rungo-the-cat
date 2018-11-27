@@ -26,7 +26,6 @@ class MainFlowFragment : BaseFragment(), MainView {
         .getInstance(MainPresenter::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        activity?.setTheme(R.style.AppTheme)
         if (isFirstLaunch(savedInstanceState)) {
             Toothpick.inject(this, Toothpick.openScope(Scopes.APP))
         }

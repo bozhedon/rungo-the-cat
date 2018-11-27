@@ -2,6 +2,7 @@ package com.myrungo.rungo.main.choice
 
 import com.arellomobile.mvp.InjectViewState
 import com.myrungo.rungo.BasePresenter
+import com.myrungo.rungo.Screens
 import com.myrungo.rungo.model.MainNavigationController
 import ru.terrakok.cicerone.Router
 import javax.inject.Inject
@@ -19,6 +20,7 @@ class ChoicePresenter @Inject constructor(
 
     fun onTrainingClicked() {
         viewState.dismiss()
+        router.navigateTo(Screens.Start)
     }
 
     fun onBackPressed() = viewState.dismiss()
