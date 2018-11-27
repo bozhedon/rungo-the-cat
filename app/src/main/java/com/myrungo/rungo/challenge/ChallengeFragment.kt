@@ -7,6 +7,7 @@ import com.hannesdorfmann.adapterdelegates3.ListDelegationAdapter
 import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
+import com.myrungo.rungo.challenge.accept.ChallengeAcceptFragment
 import com.myrungo.rungo.list.HeaderAdapterDelegate
 import com.myrungo.rungo.visible
 import kotlinx.android.synthetic.main.fragment_challenge.*
@@ -38,6 +39,13 @@ class ChallengeFragment : BaseFragment(), ChallengeView {
         challenge_progress.visible(show)
     }
 
+    override fun showAcceptDialog(distance: String, time: String, resId: Int) {
+        if (childFragmentManager.findFragmentByTag(ACCEPT_TAG) == null) {
+            ChallengeAcceptFragment.newInstance(distance, time, resId).show(childFragmentManager, ACCEPT_TAG)
+            childFragmentManager.executePendingTransactions()
+        }
+    }
+
     override fun onBackPressed() {
         presenter.onBackPressed()
     }
@@ -56,5 +64,9 @@ class ChallengeFragment : BaseFragment(), ChallengeView {
             items.addAll(data)
             notifyDataSetChanged()
         }
+    }
+
+    companion object {
+        private const val ACCEPT_TAG = "cf_accept"
     }
 }

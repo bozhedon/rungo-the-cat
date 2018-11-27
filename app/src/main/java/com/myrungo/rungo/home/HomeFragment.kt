@@ -32,16 +32,6 @@ class HomeFragment : BaseFragment(), HomeView {
         cat.slap()
     }
 
-//    override fun onPause() {
-//        cat.pause()
-//        super.onPause()
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        cat.resume()
-//    }
-
     override fun onBackPressed() {
         presenter.onBackPressed()
     }

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#884B4B4B">
+
+    <android.support.design.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:cardCornerRadius="16dp">
+
+        <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="280dp"
+                android:padding="20dp">
+
+            <TextView
+                    android:id="@+id/challenge_accept_title"
+                    android:text="Выбрать вызов?"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#828282"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                    android:id="@+id/challenge_details_title"
+                    android:text="Выполни условия вызова"
+                    android:textStyle="normal"
+                    android:textSize="12sp"
+                    android:textColor="#828282"
+                    android:layout_marginTop="15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_accept_title"/>
+
+            <TextView
+                    android:id="@+id/challenge_details_distance_title"
+                    android:text="дистанция"
+                    android:textStyle="normal"
+                    android:textSize="12sp"
+                    android:textColor="#828282"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_details_title"/>
+
+            <TextView
+                    android:id="@+id/challenge_distance_text"
+                    android:text="0 км"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#828282"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_details_distance_title"/>
+
+            <TextView
+                    android:id="@+id/challenge_details_time_title"
+                    android:text="время"
+                    android:textStyle="normal"
+                    android:textSize="12sp"
+                    android:textColor="#828282"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_distance_text"/>
+
+            <TextView
+                    android:id="@+id/challenge_time_text"
+                    android:text="00:00"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#828282"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_details_time_title"/>
+
+            <TextView
+                    android:id="@+id/challenge_accept_award_title"
+                    android:text="Получи"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#828282"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_time_text"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            <ImageView
+                    android:id="@+id/challenge_accept_award_image"
+                    android:layout_width="121dp"
+                    android:layout_height="111dp"
+                    android:layout_marginTop="10dp"
+                    android:padding="20dp"
+                    android:background="@drawable/ic_suit_background"
+                    tools:src="@drawable/karate_cat_kimono"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_accept_award_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            <LinearLayout
+                    android:id="@+id/challenge_accept_button"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintTop_toBottomOf="@+id/challenge_accept_award_image"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.0">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_check"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="9dp"
+                        android:layout_gravity="center_vertical"
+                        android:textColor="#828282"
+                        android:textStyle="bold"
+                        android:text="Начать"/>
+
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.design.card.MaterialCardView>
+</FrameLayout>

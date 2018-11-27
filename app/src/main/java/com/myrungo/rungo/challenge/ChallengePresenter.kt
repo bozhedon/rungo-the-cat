@@ -28,7 +28,14 @@ class ChallengePresenter @Inject constructor(
     }
 
     fun onChallengeClicked(challenge: ChallengeItem) {
+        val h = challenge.time / 100
+        val m = challenge.time % 100
 
+        viewState.showAcceptDialog(
+            distance = "${challenge.distance} км",
+            time = "$h:$m",
+            resId = challenge.awardRes
+        )
     }
 
     fun onBackPressed() = navigation.open(0)
