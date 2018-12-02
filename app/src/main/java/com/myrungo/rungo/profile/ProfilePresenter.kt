@@ -33,7 +33,7 @@ class ProfilePresenter @Inject constructor(
 
         viewState.showDetails(
             authData.name,
-            "${authData.distance} км"
+            authData.distance.toFloat()
         )
 
         viewState.showTab(0)

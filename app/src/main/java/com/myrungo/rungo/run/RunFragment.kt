@@ -3,6 +3,8 @@ package com.myrungo.rungo.run
 import android.os.Bundle
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
@@ -12,8 +14,9 @@ import com.myrungo.rungo.visible
 import kotlinx.android.synthetic.main.fragment_run.*
 import toothpick.Toothpick
 
-class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener {
+class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMapReadyCallback {
     override val layoutRes = R.layout.fragment_run
+    private var map: GoogleMap? = null
 
     @InjectPresenter
     lateinit var presenter: RunPresenter
@@ -25,6 +28,8 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        map_view.onCreate(savedInstanceState)
+        map_view.getMapAsync(this)
 
         play_button.setOnClickListener { presenter.onStartClicked() }
         stop_button.setOnClickListener { presenter.onStopClicked() }
@@ -40,9 +45,9 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener {
         timer_challenge.visible(challengeTime.isNotEmpty())
     }
 
-    override fun showSpeed(curSpeed: String, avgSpeed: String) {
-        speed.text = curSpeed
-        average_speed.text = avgSpeed
+    override fun showSpeed(curSpeed: Float, avgSpeed: Float) {
+        speed.text = getString(R.string.speed, curSpeed)
+        average_speed.text = getString(R.string.avg_speed, avgSpeed)
     }
 
     override fun showDistance(curDistance: String, challengeDistance: String) {
@@ -68,6 +73,10 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener {
         map_view.visible(show)
         cat_view.visible(!show)
         content_frame.visible(!show)
+    }
+
+    override fun onMapReady(googleMap: GoogleMap?) {
+        map = googleMap
     }
 
     override fun showDialog(title: String, msg: String, tag: String) {

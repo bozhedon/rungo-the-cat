@@ -7,6 +7,6 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface ProfileView : MvpView {
     fun showCat(resId: Int)
-    fun showDetails(name: String, distance: String)
+    fun showDetails(name: String, distance: Float)
     fun showTab(position: Int)
 }

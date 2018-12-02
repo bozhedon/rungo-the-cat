@@ -240,7 +240,8 @@
             app:layout_constraintTop_toTopOf="@+id/content_frame"
             app:layout_constraintBottom_toBottomOf="@+id/content_frame"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintVertical_bias="0.8"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.8"/>
 
     <LinearLayout
             android:id="@+id/play_layout"

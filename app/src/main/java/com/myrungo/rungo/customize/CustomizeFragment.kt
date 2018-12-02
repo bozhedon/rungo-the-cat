@@ -28,6 +28,7 @@ class CustomizeFragment : BaseFragment(), CustomizeView {
         super.onActivityCreated(savedInstanceState)
         custom_recycler_view.adapter = adapter
         custom_check_button.setOnClickListener { presenter.onSelectClicked() }
+        custom_default_button.setOnClickListener { presenter.onDefaultSelected() }
     }
 
     override fun showSkinReference(resId: Int) {

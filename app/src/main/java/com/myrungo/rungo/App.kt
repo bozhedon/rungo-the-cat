@@ -11,6 +11,8 @@ import com.myrungo.rungo.model.*
 import com.yandex.metrica.YandexMetrica
 import com.yandex.metrica.YandexMetricaConfig
 import io.fabric.sdk.android.Fabric
+import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
+import pl.charmas.android.reactivelocation2.ReactiveLocationProviderConfiguration
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -87,6 +89,16 @@ class App : Application() {
                         bind(MainNavigationController::class.java).toInstance(MainNavigationController())
                         bind(CatController::class.java).toInstance(CatController())
                         bind(ChallengeController::class.java).toInstance(ChallengeController())
+
+                        bind(ReactiveLocationProvider::class.java)
+                            .toInstance(
+                                ReactiveLocationProvider(
+                                    applicationContext,
+                                    ReactiveLocationProviderConfiguration.builder()
+                                        .setRetryOnConnectionSuspended(true)
+                                        .build()
+                                )
+                            )
 
                         bind(Gson::class.java).toInstance(Gson())
                         bind(AuthHolder::class.java).to(Prefs::class.java).singletonInScope()

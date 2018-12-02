@@ -38,7 +38,7 @@ class ChallengeAdapterDelegate(private val clickListener: (ChallengeItem) -> Uni
             val m = challenge.time % 100
 
             with(itemView) {
-                item_challenge_distance.text = context.getString(R.string.distance, challenge.distance)
+                item_challenge_distance.text = context.getString(R.string.distance, challenge.distance.toFloat())
                 item_challenge_time.text = "$h:$m"
 
                 Glide.with(this)

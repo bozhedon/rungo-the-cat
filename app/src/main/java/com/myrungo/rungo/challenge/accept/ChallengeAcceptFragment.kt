@@ -62,7 +62,7 @@ class ChallengeAcceptFragment : DialogFragment(), ChallengeAcceptView {
                     { Timber.e(it) }
                 )
         }
-        challenge_distance_text.text = getString(R.string.distance, challenge?.distance)
+        challenge_distance_text.text = getString(R.string.distance, challenge?.distance?.toFloat() ?: 0f)
         challenge_time_text.text = challenge?.let { "${it.time/100}:${it.time%100}" } ?: ""
         Glide.with(this)
             .load(challenge?.awardRes)

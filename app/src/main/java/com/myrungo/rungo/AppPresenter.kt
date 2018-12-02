@@ -15,7 +15,8 @@ class AppPresenter @Inject constructor(
 ) : MvpPresenter<MvpView>() {
 
     fun initMainScreen(account: GoogleSignInAccount) {
-        account.account?.let { authData.name = account.account!!.name }
+        authData.name = account.displayName ?: "User"
+
         catController.setSkin(authData.currentSkin)
         router.newRootScreen(Screens.MainFlow)
     }

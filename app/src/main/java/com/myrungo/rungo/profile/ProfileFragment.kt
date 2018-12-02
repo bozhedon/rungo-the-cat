@@ -34,9 +34,9 @@ class ProfileFragment : BaseFragment(), ProfileView {
             .into(profile_cat_image)
     }
 
-    override fun showDetails(name: String, distance: String) {
+    override fun showDetails(name: String, distance: Float) {
         profile_name.text = name
-        profile_total_distance.text = distance
+        profile_total_distance.text = getString(R.string.distance, distance)
     }
 
     override fun showTab(position: Int) {

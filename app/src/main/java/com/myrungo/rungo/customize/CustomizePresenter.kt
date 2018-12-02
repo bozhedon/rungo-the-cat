@@ -52,14 +52,22 @@ class CustomizePresenter @Inject constructor(
                 CatView.Skins.NORMAL -> R.drawable.normal_cat
             }
         )
+
+        authData.currentSkin = skin
     }
 
     fun onSelectClicked() {
+        if (authData.currentSkin == getSkin(skinResId ?: R.drawable.common_cat)) return
+
         skinResId?.let {
             catController.setSkin(getSkin(it))
-            authData.currentSkin = getSkin(it)
             router.navigateTo(Screens.CustomizeDone(it))
         }
+    }
+
+    fun onDefaultSelected() {
+        skinResId = null
+        catController.setSkin(CatView.Skins.COMMON)
     }
 
     fun onSkinClicked(skin: SkinItem) {

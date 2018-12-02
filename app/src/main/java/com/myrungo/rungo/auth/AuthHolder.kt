@@ -6,6 +6,11 @@ import com.myrungo.rungo.challenge.ChallengeItem
 interface AuthHolder {
     var name: String
     var distance: Double
+    // distance
+    var distanceWeek: Double
+    var distanceMonth: Double
+    var distanceYear: Double
+
     var availableSkins: List<CatView.Skins>
     var currentSkin: CatView.Skins
     var completedChallenges: List<ChallengeItem>

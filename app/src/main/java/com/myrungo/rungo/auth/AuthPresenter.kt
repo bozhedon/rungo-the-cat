@@ -32,9 +32,9 @@ class AuthPresenter @Inject constructor(
     fun handleAuthResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == AppActivity.RC_SIGN_IN && resultCode == Activity.RESULT_OK) {
             try {
-                GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)?.account?.let {
+                GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)?.let {
                     Completable.fromAction {
-                        authData.name = it.name
+                        authData.name = it.displayName ?: "User"
                         //TODO
                         authData.availableSkins = emptyList()
                         authData.completedChallenges = emptyList()
