@@ -7,9 +7,9 @@ import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.myrungo.rungo.FlowFragment
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.Screens
+import com.myrungo.rungo.challenge.ChallengeController
+import com.myrungo.rungo.challenge.ChallengeItem
 import com.myrungo.rungo.model.FlowRouter
-import com.myrungo.rungo.model.PrimitiveWrapper
-import com.myrungo.rungo.model.qualifier.ArgTraining
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -46,9 +46,8 @@ class RunFlowFragment : FlowFragment(), MvpView {
                         bind(FlowRouter::class.java).toInstance(cicerone.router)
                         bind(NavigatorHolder::class.java).toInstance(cicerone.navigatorHolder)
 
-                        bind(PrimitiveWrapper::class.java)
-                            .withName(ArgTraining::class.java)
-                            .toInstance(PrimitiveWrapper(arguments?.get(ARG_TRAINING) ?: true))
+                        bind(ChallengeItem::class.java)
+                            .toInstance(arguments?.getParcelable(ARG_CHALLENGE) ?: ChallengeController.EMPTY)
                     }
                 }
             )
@@ -61,10 +60,10 @@ class RunFlowFragment : FlowFragment(), MvpView {
     }
 
     companion object {
-        private const val ARG_TRAINING = "rff_training"
-        fun newInstance(isTraining: Boolean) = RunFlowFragment()
+        private const val ARG_CHALLENGE = "rff_challenge"
+        fun newInstance(challenge: ChallengeItem?) = RunFlowFragment()
             .apply {
-                arguments = Bundle().apply { putBoolean(ARG_TRAINING, isTraining) }
+                arguments = Bundle().apply { putParcelable(ARG_CHALLENGE, challenge) }
             }
     }
 }

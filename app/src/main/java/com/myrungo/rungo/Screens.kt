@@ -4,6 +4,7 @@ import com.myrungo.rungo.auth.AuthFlowFragment
 import com.myrungo.rungo.auth.AuthFragment
 import com.myrungo.rungo.auth.welcome.WelcomeFragment
 import com.myrungo.rungo.challenge.ChallengeFragment
+import com.myrungo.rungo.challenge.ChallengeItem
 import com.myrungo.rungo.customize.CustomizeFragment
 import com.myrungo.rungo.customize_done.CustomizeDoneFragment
 import com.myrungo.rungo.home.HomeFragment
@@ -51,8 +52,8 @@ object Screens {
         override fun getFragment() = CustomizeDoneFragment.newInstance(skinRes)
     }
 
-    data class RunFlow(val isTraining: Boolean) : SupportAppScreen() {
-        override fun getFragment() = RunFlowFragment.newInstance(isTraining)
+    data class RunFlow(val challenge: ChallengeItem? = null) : SupportAppScreen() {
+        override fun getFragment() = RunFlowFragment.newInstance(challenge)
     }
 
     object Run : SupportAppScreen() {

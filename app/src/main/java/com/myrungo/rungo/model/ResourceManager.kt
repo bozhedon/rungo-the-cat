@@ -7,5 +7,5 @@ class ResourceManager @Inject constructor(private val context: Context) {
 
     fun getString(id: Int) = context.getString(id)
 
-    fun getString(id: Int, vararg args: Any) = context.getString(id, args)
+    fun getString(id: Int, vararg args: Any) = context.getString(id, *args)
 }

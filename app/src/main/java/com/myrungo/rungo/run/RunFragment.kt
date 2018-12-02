@@ -7,11 +7,12 @@ import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.cat.CatView
+import com.myrungo.rungo.run.alert.AlertFragment
 import com.myrungo.rungo.visible
 import kotlinx.android.synthetic.main.fragment_run.*
 import toothpick.Toothpick
 
-class RunFragment : BaseFragment(), RunView {
+class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener {
     override val layoutRes = R.layout.fragment_run
 
     @InjectPresenter
@@ -69,7 +70,8 @@ class RunFragment : BaseFragment(), RunView {
         content_frame.visible(!show)
     }
 
-    override fun showDialog() {
+    override fun showDialog(title: String, msg: String, tag: String) {
+        AlertFragment.create(title, msg, tag).show(childFragmentManager, tag)
     }
 
     override fun run(isRun: Boolean) {
@@ -89,7 +91,11 @@ class RunFragment : BaseFragment(), RunView {
         }
     }
 
+    override fun dialogPositiveClicked(tag: String) {
+        presenter.exit()
+    }
+
     override fun onBackPressed() {
-        presenter.onBackPressed()
+        presenter.onStopClicked()
     }
 }

@@ -39,9 +39,9 @@ class ChallengeFragment : BaseFragment(), ChallengeView {
         challenge_progress.visible(show)
     }
 
-    override fun showAcceptDialog(distance: String, time: String, resId: Int) {
+    override fun showAcceptDialog(challenge: ChallengeItem) {
         if (childFragmentManager.findFragmentByTag(ACCEPT_TAG) == null) {
-            ChallengeAcceptFragment.newInstance(distance, time, resId).show(childFragmentManager, ACCEPT_TAG)
+            ChallengeAcceptFragment.newInstance(challenge).show(childFragmentManager, ACCEPT_TAG)
             childFragmentManager.executePendingTransactions()
         }
     }

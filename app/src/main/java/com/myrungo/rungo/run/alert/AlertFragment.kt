@@ -34,11 +34,11 @@ class AlertFragment : DialogFragment() {
         alert_view.setOnClickListener { }
         alert_cancel_button.setOnClickListener {
             dismissAllowingStateLoss()
-            clickListener.dialogNegativeClicked(arguments?.getString(ARG_TAG) ?: "")
+            clickListener.dialogNegativeClicked(arguments?.getString(ARG_TAG) ?: "alert_dialog_tag")
         }
         alert_accept_button.setOnClickListener {
             dismissAllowingStateLoss()
-            clickListener.dialogPositiveClicked(arguments?.getString(ARG_TAG) ?: "")
+            clickListener.dialogPositiveClicked(arguments?.getString(ARG_TAG) ?: "alert_dialog_tag")
         }
     }
 

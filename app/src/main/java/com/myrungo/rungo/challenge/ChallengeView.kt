@@ -11,5 +11,5 @@ interface ChallengeView : MvpView {
     fun showProgress(show: Boolean)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun showAcceptDialog(distance: String, time: String, resId: Int)
+    fun showAcceptDialog(challenge: ChallengeItem)
 }

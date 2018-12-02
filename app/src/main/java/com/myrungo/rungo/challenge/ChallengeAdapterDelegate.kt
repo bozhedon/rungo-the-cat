@@ -7,7 +7,6 @@ import com.bumptech.glide.Glide
 import com.hannesdorfmann.adapterdelegates3.AdapterDelegate
 import com.myrungo.rungo.R
 import com.myrungo.rungo.inflate
-import com.myrungo.rungo.toDate
 import kotlinx.android.synthetic.main.item_challenge.view.*
 
 class ChallengeAdapterDelegate(private val clickListener: (ChallengeItem) -> Unit = {}) : AdapterDelegate<MutableList<Any>>() {
