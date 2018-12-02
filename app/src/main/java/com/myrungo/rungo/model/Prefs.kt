@@ -65,7 +65,7 @@ class Prefs @Inject constructor(
             }
         }
         set(value) {
-            getSharedPreferences(AUTH_DATA).edit().putString(KEY_SKINS, gson.toJson(value)).apply()
+            getSharedPreferences(AUTH_DATA).edit().putString(KEY_SKINS, gson.toJson(value)).commit()
         }
 
     override var currentSkin: CatView.Skins

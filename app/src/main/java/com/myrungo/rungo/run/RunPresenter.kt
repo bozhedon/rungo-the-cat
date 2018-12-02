@@ -4,12 +4,12 @@ import android.location.Location
 import com.arellomobile.mvp.InjectViewState
 import com.google.android.gms.location.LocationRequest
 import com.myrungo.rungo.BasePresenter
-import com.myrungo.rungo.R
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
+import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.challenge.ChallengeItem
-import com.myrungo.rungo.model.ResourceManager
+import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.SchedulersProvider
 import com.myrungo.rungo.toTime
 import io.reactivex.Observable
@@ -26,8 +26,9 @@ class RunPresenter @Inject constructor(
     private val router: Router,
     private val locationProvider: ReactiveLocationProvider,
     private val catController: CatController,
+    private val challengeController: ChallengeController,
+    private val navigationController: MainNavigationController,
     private val schedulers: SchedulersProvider,
-    private val resourceManager: ResourceManager,
     private val authData: AuthHolder
 ) : BasePresenter<RunView>() {
     private val req = LocationRequest.create()
@@ -39,6 +40,7 @@ class RunPresenter @Inject constructor(
     private var timerDisposable: Disposable? = null
     private var initTime = 0
     private var isComplete = false
+    private var timeOut = false
     private var currentLocation: Location? = null
     private var currentDistance = 0f
     private var lastDistance = 0f
@@ -103,6 +105,14 @@ class RunPresenter @Inject constructor(
                     initTime++
                     viewState.showTime(initTime.toTime(), challengeTime)
 
+                    val h = challenge.time / 100
+                    val m = challenge.time % 100
+
+                    if (challenge.id != ChallengeController.EMPTY.id) {
+                        isComplete = (currentDistance >= challenge.distance && initTime <= m * 60 + h * 3600)
+                        timeOut = initTime >= m * 60 + h * 3600
+                    }
+
                     viewState.showSpeed(
                         if ((initTime - lastTime).toFloat()/3600 > 0) (lastDistance/1000)/((initTime - lastTime).toFloat()/3600) else 0f,
                         if (initTime.toFloat()/3600 > 0) currentDistance/(initTime.toFloat()/3600) else 0f
@@ -130,22 +140,47 @@ class RunPresenter @Inject constructor(
     }
 
     fun onStopClicked() {
-        if (!isComplete && challenge.id != ChallengeController.EMPTY.id) {
+        if (!isComplete && challenge.id != ChallengeController.EMPTY.id && !timeOut) {
             viewState.showDialog(
                 title = "Нет больше сил?",
                 msg = "Твой вызов еще не выполнен!\nЗакончить тренировку?",
                 tag = DIALOG_TAG
             )
-        } else if (!isComplete) {
+        } else if (!isComplete && !timeOut && challenge.id == ChallengeController.EMPTY.id) {
             viewState.showDialog(
                 title = "Закончить тренировку?",
                 msg = "",
                 tag = DIALOG_TAG
             )
+        } else if (isComplete && challenge.id != ChallengeController.EMPTY.id) {
+            viewState.showDialog(
+                title = "Поздравляем!",
+                msg = "Молодец! Ты выполнил вызов!\n" + "Закончить тренировку?",
+                tag = DIALOG_TAG
+            )
+        } else {
+            viewState.showDialog(
+                title = "Вызов не выполнен",
+                msg = "Продолжить как тренировку?",
+                tag = DIALOG_TAG
+            )
         }
     }
 
-    fun exit() = router.exit()
+    fun exit() {
+        if (isComplete && challenge.id != ChallengeController.EMPTY.id) {
+            challengeController.finishChallenge(challenge)
+
+            val availableSkins = mutableListOf<CatView.Skins>()
+            availableSkins.addAll(authData.availableSkins)
+            ChallengeController.getAward(challenge)?.let { availableSkins.add(it) }
+
+            authData.availableSkins = availableSkins
+
+            navigationController.open(1)
+        }
+        router.exit()
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -153,7 +188,6 @@ class RunPresenter @Inject constructor(
     }
 
     companion object {
-        private const val LOCATION_TIMEOUT = 10000L
         private const val LOCATION_UPDATE_INTERVAL = 100L
         private const val DIALOG_TAG = "rp_dialog_tag"
     }

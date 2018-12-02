@@ -57,6 +57,8 @@ class ChallengeAcceptFragment : DialogFragment(), ChallengeAcceptView {
                     { isGranted ->
                         if (isGranted) {
                             presenter.accept(challenge)
+                            dismissAllowingStateLoss()
+                            childFragmentManager.executePendingTransactions()
                         }
                     },
                     { Timber.e(it) }

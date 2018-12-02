@@ -7,9 +7,11 @@ data class ChallengeItem(
     val id: Int,
     val distance: Int,
     val time: Int,
-    val awardRes: Int
+    val awardRes: Int,
+    var isComplete: Int = 0
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
         parcel.readInt(),
@@ -21,6 +23,7 @@ data class ChallengeItem(
         parcel.writeInt(distance)
         parcel.writeInt(time)
         parcel.writeInt(awardRes)
+        parcel.writeInt(isComplete)
     }
 
     override fun describeContents(): Int {

@@ -7,6 +7,7 @@ import com.myrungo.rungo.Screens
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
+import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.model.MainNavigationController
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
@@ -17,7 +18,8 @@ class CustomizePresenter @Inject constructor(
     private val router: Router,
     private val navigation: MainNavigationController,
     private val authData: AuthHolder,
-    private val catController: CatController
+    private val catController: CatController,
+    private val challengeController: ChallengeController
 ) : BasePresenter<CustomizeView>() {
 
     private var skinResId: Int? = null
@@ -32,14 +34,30 @@ class CustomizePresenter @Inject constructor(
             )
             .connect()
 
-        viewState.showSkins(
-            listOf(
-                SkinItem(0, R.drawable.normal_cat_sportsuniform, true),
-                SkinItem(1, R.drawable.bad_cat_jacket, false),
-                SkinItem(2, R.drawable.bussiness_cat_cloth, false),
-                SkinItem(3, R.drawable.karate_cat_kimono, false)
+        challengeController.state
+            .subscribe(
+                {
+                    val skins = listOf(
+                        SkinItem(0, R.drawable.normal_cat_sportsuniform, true),
+                        SkinItem(1, R.drawable.bad_cat_jacket, it.awardRes == R.drawable.bad_cat_jacket),
+                        SkinItem(2, R.drawable.bussiness_cat_cloth, it.awardRes == R.drawable.bussiness_cat_cloth),
+                        SkinItem(3, R.drawable.karate_cat_kimono, it.awardRes == R.drawable.karate_cat_kimono)
+                    )
+
+                    viewState.showSkins(skins)
+                },
+                { Timber.e(it) }
             )
+            .connect()
+
+        val skins = listOf(
+            SkinItem(0, R.drawable.normal_cat_sportsuniform, true),
+            SkinItem(1, R.drawable.bad_cat_jacket, authData.availableSkins.find { it == CatView.Skins.BAD } != null),
+            SkinItem(2, R.drawable.bussiness_cat_cloth, authData.availableSkins.find { it == CatView.Skins.BUSINESS } != null),
+            SkinItem(3, R.drawable.karate_cat_kimono, authData.availableSkins.find { it == CatView.Skins.KARATE } != null)
         )
+
+        viewState.showSkins(skins)
     }
 
     private fun handleSkin(skin: CatView.Skins) {
