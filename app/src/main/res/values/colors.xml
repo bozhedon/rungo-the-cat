@@ -8,4 +8,7 @@
     <color name="black">@android:color/black</color>
     <color name="white">@android:color/white</color>
     <color name="whiteOverlay">#B2FFFFFF</color>
+
+    <color name="run_active_background">#F2994A</color>
+    <color name="run_accent_background">#6A421E</color>
 </resources>

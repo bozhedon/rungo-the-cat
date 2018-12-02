@@ -20,7 +20,7 @@ class ChoicePresenter @Inject constructor(
 
     fun onTrainingClicked() {
         viewState.dismiss()
-        router.navigateTo(Screens.Start)
+        router.navigateTo(Screens.RunFlow(true))
     }
 
     fun onBackPressed() = viewState.dismiss()

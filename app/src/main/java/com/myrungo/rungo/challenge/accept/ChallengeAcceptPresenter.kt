@@ -12,6 +12,6 @@ class ChallengeAcceptPresenter @Inject constructor(
 ) : BasePresenter<ChallengeAcceptView>() {
 
     fun accept() {
-        router.navigateTo(Screens.Start)
+        router.navigateTo(Screens.RunFlow(false))
     }
 }

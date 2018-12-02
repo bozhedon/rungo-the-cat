@@ -1,7 +1,5 @@
 package com.myrungo.rungo
 
-import android.content.Context
-import android.content.Intent
 import com.myrungo.rungo.auth.AuthFlowFragment
 import com.myrungo.rungo.auth.AuthFragment
 import com.myrungo.rungo.auth.welcome.WelcomeFragment
@@ -13,7 +11,6 @@ import com.myrungo.rungo.main.MainFlowFragment
 import com.myrungo.rungo.profile.ProfileFragment
 import com.myrungo.rungo.run.RunFlowFragment
 import com.myrungo.rungo.run.RunFragment
-import com.myrungo.rungo.shit.start.StartActivity
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -54,15 +51,11 @@ object Screens {
         override fun getFragment() = CustomizeDoneFragment.newInstance(skinRes)
     }
 
-    object RunFlow : SupportAppScreen() {
-        override fun getFragment() = RunFlowFragment()
+    data class RunFlow(val isTraining: Boolean) : SupportAppScreen() {
+        override fun getFragment() = RunFlowFragment.newInstance(isTraining)
     }
 
     object Run : SupportAppScreen() {
         override fun getFragment() = RunFragment()
-    }
-
-    object Start : SupportAppScreen() {
-        override fun getActivityIntent(context: Context?) = Intent(context, StartActivity::class.java)
     }
 }

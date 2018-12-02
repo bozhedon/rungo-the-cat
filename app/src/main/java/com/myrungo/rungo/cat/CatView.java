@@ -32,6 +32,7 @@ public class CatView extends ConstraintLayout {
     private ImageView eyeLeft;
 
     private Heads currentHead;
+    private Animation.AnimationListener animationListener = null;
 
     public CatView(Context context) {
         super(context);
@@ -46,6 +47,10 @@ public class CatView extends ConstraintLayout {
     public CatView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+    }
+
+    public void setAnimationListener(Animation.AnimationListener animationListener) {
+        this.animationListener = animationListener;
     }
 
     private void init() {
@@ -341,6 +346,8 @@ public class CatView extends ConstraintLayout {
     public void slap() {
         stop();
 
+        Heads curhead = currentHead;
+
         Animation headAnimation = new RotateAnimation(0, 10, headWidth/2, headHeight/2);
         headAnimation.setDuration(500);
         headAnimation.setRepeatMode(ValueAnimator.REVERSE);
@@ -358,6 +365,22 @@ public class CatView extends ConstraintLayout {
         handRightAnimation.setRepeatMode(ValueAnimator.REVERSE);
         handRightAnimation.setRepeatCount(1);
         handRightAnimation.setFillAfter(true);
+
+        headAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                if (animationListener != null) animationListener.onAnimationStart(animation);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (animationListener != null) animationListener.onAnimationEnd(animation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
 
         head.startAnimation(headAnimation);
         handLeft.startAnimation(handLeftAnimation);

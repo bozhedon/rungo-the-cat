@@ -26,7 +26,7 @@
     <string name="notification">Макс. скорость : %1$s, Пройдено : %2$s.</string>
     <string name="noti_id" translatable="false">StepsV2id</string>
     <string name="custom_frag_title">Выбери одежду</string>
-    <string name="distance_gone">Пройдено</string>
+
     <string name="unknown_error_has_occured">Произошла неизвестная ошибка</string>
     <string name="no_internet_connection">Подключение к Интернету отсутствует</string>
     <string name="play_services_update_cancelled">Обновление Play Services прервано</string>
@@ -37,4 +37,14 @@
     <string name="swipe_from_up_to_down">Свайпните сверху вниз</string>
     <string name="you_do_not_have_any_costume">Вы ещё не получили ни одного костюма :(</string>
     <string name="zero_time">00:00:00</string>
+
+    <!-- Run -->
+    <string name="run_distance_title">километры</string>
+    <string name="time_title">время</string>
+    <string name="speed_title">тек. скорость</string>
+    <string name="speed">%d км/ч</string>
+    <string name="avg_speed_title">сред. скорость</string>
+    <string name="avg_speed">%d км/ч</string>
+    <string name="tab_run">бег</string>
+    <string name="tab_map">карта</string>
 </resources>

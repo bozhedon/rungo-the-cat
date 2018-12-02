@@ -6,6 +6,7 @@ import com.crashlytics.android.Crashlytics
 import com.google.gson.Gson
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
+import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.model.*
 import com.yandex.metrica.YandexMetrica
 import com.yandex.metrica.YandexMetricaConfig
@@ -17,6 +18,8 @@ import timber.log.Timber
 import toothpick.Toothpick
 import toothpick.config.Module
 import toothpick.configuration.Configuration
+import toothpick.registries.FactoryRegistryLocator
+import toothpick.registries.MemberInjectorRegistryLocator
 import java.util.*
 
 class App : Application() {
@@ -67,9 +70,9 @@ class App : Application() {
         if (BuildConfig.DEBUG) {
             Toothpick.setConfiguration(Configuration.forDevelopment().preventMultipleRootScopes())
         } else {
-            //Toothpick.setConfiguration(Configuration.forProduction().disableReflection())
-            //FactoryRegistryLocator.setRootRegistry(com.myrungo.rungo.FactoryRegistry())
-            //MemberInjectorRegistryLocator.setRootRegistry(com.myrungo.rungo.MemberInjectorRegistry())
+            Toothpick.setConfiguration(Configuration.forProduction().disableReflection())
+            FactoryRegistryLocator.setRootRegistry(com.myrungo.rungo.FactoryRegistry())
+            MemberInjectorRegistryLocator.setRootRegistry(com.myrungo.rungo.MemberInjectorRegistry())
         }
     }
 
@@ -83,6 +86,7 @@ class App : Application() {
                         bind(ResourceManager::class.java).singletonInScope()
                         bind(MainNavigationController::class.java).toInstance(MainNavigationController())
                         bind(CatController::class.java).toInstance(CatController())
+                        bind(ChallengeController::class.java).toInstance(ChallengeController())
 
                         bind(Gson::class.java).toInstance(Gson())
                         bind(AuthHolder::class.java).to(Prefs::class.java).singletonInScope()

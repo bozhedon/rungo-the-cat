@@ -1,5 +1,7 @@
 package com.myrungo.rungo.home
 
+import android.os.Bundle
+import android.view.animation.Animation
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.myrungo.rungo.BaseFragment
@@ -19,6 +21,27 @@ class HomeFragment : BaseFragment(), HomeView {
     fun providePresenter() = Toothpick
         .openScope(Scopes.APP)
         .getInstance(HomePresenter::class.java)
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        cat.setOnClickListener { slap() }
+
+        cat.setAnimationListener(object : Animation.AnimationListener {
+            private var currentHead = cat.currentHead
+
+            override fun onAnimationStart(animation: Animation) {
+                cat.setHead(CatView.Heads.SHOCK)
+            }
+
+            override fun onAnimationEnd(animation: Animation) {
+                cat.setHead(currentHead)
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {
+
+            }
+        })
+    }
 
     override fun showCat(skin: CatView.Skins) {
         cat.setSkin(skin)

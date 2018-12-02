@@ -8,6 +8,8 @@ import com.myrungo.rungo.FlowFragment
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.Screens
 import com.myrungo.rungo.model.FlowRouter
+import com.myrungo.rungo.model.PrimitiveWrapper
+import com.myrungo.rungo.model.qualifier.ArgTraining
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -43,6 +45,10 @@ class RunFlowFragment : FlowFragment(), MvpView {
                         val cicerone = Cicerone.create(FlowRouter(scope.getInstance(Router::class.java)))
                         bind(FlowRouter::class.java).toInstance(cicerone.router)
                         bind(NavigatorHolder::class.java).toInstance(cicerone.navigatorHolder)
+
+                        bind(PrimitiveWrapper::class.java)
+                            .withName(ArgTraining::class.java)
+                            .toInstance(PrimitiveWrapper(arguments?.get(ARG_TRAINING) ?: true))
                     }
                 }
             )
@@ -52,5 +58,13 @@ class RunFlowFragment : FlowFragment(), MvpView {
 
     override fun onExit() {
         presenter.onExit()
+    }
+
+    companion object {
+        private const val ARG_TRAINING = "rff_training"
+        fun newInstance(isTraining: Boolean) = RunFlowFragment()
+            .apply {
+                arguments = Bundle().apply { putBoolean(ARG_TRAINING, isTraining) }
+            }
     }
 }

@@ -2,7 +2,6 @@ package com.myrungo.rungo.home
 
 import com.arellomobile.mvp.InjectViewState
 import com.myrungo.rungo.BasePresenter
-import com.myrungo.rungo.R
 import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
 import ru.terrakok.cicerone.Router
@@ -24,7 +23,6 @@ class HomePresenter @Inject constructor(
                 { Timber.e(it) }
             )
             .connect()
-
 
         viewState.greet()
     }
