@@ -11,8 +11,8 @@ android {
         applicationId "com.myrungo.rungo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.0"
+        versionCode 4
+        versionName "1.0-beta4"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [toothpick_registry_package_name: 'com.myrungo.rungo']
@@ -90,4 +90,9 @@ dependencies {
     implementation ('com.google.android.gms:play-services-location:16.0.0') {
         exclude group: 'com.android.support'
     }
+    implementation ('com.google.firebase:firebase-auth:16.0.5') {
+        exclude group: 'com.android.support'
+    }
+
+    implementation 'com.github.FrangSierra:RxFirebase:1.5.6'
 }

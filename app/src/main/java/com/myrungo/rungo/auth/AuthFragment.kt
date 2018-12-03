@@ -11,7 +11,7 @@ import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.visible
-import kotlinx.android.synthetic.main.fragment_auth.*
+import kotlinx.android.synthetic.main.fragment_auth.auth_button
 import toothpick.Toothpick
 
 class AuthFragment : BaseFragment(), AuthView {
@@ -23,7 +23,7 @@ class AuthFragment : BaseFragment(), AuthView {
     @ProvidePresenter
     fun providePresenter() = Toothpick
         .openScope(Scopes.AUTH)
-        .getInstance(AuthPresenter::class.java)
+        .getInstance(AuthPresenter::class.java)!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -33,10 +33,14 @@ class AuthFragment : BaseFragment(), AuthView {
 
     override fun signIn() {
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
-        startActivityForResult(GoogleSignIn.getClient(requireContext(), options).signInIntent, RC_SIGN_IN)
+        startActivityForResult(
+            GoogleSignIn.getClient(requireContext(), options).signInIntent,
+            RC_SIGN_IN
+        )
     }
 
     override fun showButton(show: Boolean) {
