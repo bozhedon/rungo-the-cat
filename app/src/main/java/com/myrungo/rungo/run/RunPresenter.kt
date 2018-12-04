@@ -12,6 +12,7 @@ import com.myrungo.rungo.model.SchedulersProvider
 import com.myrungo.rungo.model.database.AppDatabase
 import com.myrungo.rungo.model.location.TraininigListener
 import com.myrungo.rungo.toTime
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
@@ -176,6 +177,12 @@ class RunPresenter @Inject constructor(
 
             navigationController.open(1)
         }
+
+        Completable.fromCallable { database.locationDao.clear() }
+            .subscribeOn(schedulers.io())
+            .subscribe({}, { Timber.e(it) })
+            .connect()
+
         router.exit()
     }
 
