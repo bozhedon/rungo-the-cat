@@ -121,17 +121,15 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
     }
 
     override fun drawRoute(locationDb: LocationDb) {
-        if(lastLatLng==null) {
-            lastLatLng= LatLng(locationDb.latitude, locationDb.longitude)
-        }
-
-        else {
+        if (lastLatLng == null) {
+            lastLatLng = LatLng(locationDb.latitude, locationDb.longitude)
+            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationDb.latitude, locationDb.longitude), 17f))
+        } else {
             val polylineOptions = PolylineOptions().width(10f).color(Color.YELLOW)
             polylineOptions.add(lastLatLng, LatLng(locationDb.latitude, locationDb.longitude))
-            //val polyline = map.addPolyline(polylineOptions)
             map?.addPolyline(polylineOptions)
             map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationDb.latitude, locationDb.longitude), 17f))
-            lastLatLng= LatLng(locationDb.latitude, locationDb.longitude)
+            lastLatLng = LatLng(locationDb.latitude, locationDb.longitude)
         }
     }
 
