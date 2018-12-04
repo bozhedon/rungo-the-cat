@@ -15,7 +15,10 @@ import com.myrungo.rungo.challenge.ChallengeItem
 import com.myrungo.rungo.constants.*
 import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.SchedulersProvider
+import com.myrungo.rungo.model.database.AppDatabase
+import com.myrungo.rungo.model.location.TraininigListener
 import com.myrungo.rungo.toTime
+import io.reactivex.Completable
 import durdinapps.rxfirebase2.RxFirestore
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -29,56 +32,42 @@ import javax.inject.Inject
 class RunPresenter @Inject constructor(
     private val challenge: ChallengeItem,
     private val router: Router,
-    private val locationProvider: ReactiveLocationProvider,
     private val catController: CatController,
     private val challengeController: ChallengeController,
     private val navigationController: MainNavigationController,
     private val schedulers: SchedulersProvider,
-    private val authData: AuthHolder
+    private val authData: AuthHolder,
+    private val database: AppDatabase,
+    private val traininigListener: TraininigListener
 ) : BasePresenter<RunView>() {
-    private val req = LocationRequest.create()
-        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-        .setInterval(LOCATION_UPDATE_INTERVAL)
 
     private var currentTab = 0
-    private var isRun = false
     private var timerDisposable: Disposable? = null
     private var initTime = 0
     private var isComplete = false
     private var timeOut = false
-    private var currentLocation: Location? = null
     private var currentDistance = 0f
     private var lastDistance = 0f
     private var lastTime = 0
 
     private val challengeTime =
-        if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time / 100}:${challenge.time % 100}"
-        else ""
+            if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time/100}:${challenge.time%100}"
+            else ""
 
     private val challengeDistance =
         if (challenge.id != ChallengeController.EMPTY.id) challenge.distance.toString()
         else ""
 
-    @SuppressLint("MissingPermission")
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
 
-        locationProvider.getUpdatedLocation(req)
-            .filter { isRun }
+        traininigListener.isRun = false
+
+        database.locationDao.listenLastLocation()
             .observeOn(schedulers.ui())
-            .doOnSubscribe { viewState.showDistance("0,0", challengeDistance) }
             .subscribe(
                 { location ->
-                    val temp = currentLocation
-                    currentLocation = location
-
-                    val distance = if (temp != null) currentLocation?.distanceTo(temp) ?: 0f else 0f
-                    lastDistance = distance
-                    lastTime = initTime
-                    currentDistance += if (distance > 0) distance / 1000 else 0f
-                    viewState.showDistance("%.1f".format(currentDistance), challengeDistance)
-
-                    authData.distance = authData.distance + currentDistance
+                    //TODO отображать метки
                 },
                 { Timber.e(it) }
             )
@@ -87,6 +76,14 @@ class RunPresenter @Inject constructor(
         catController.skinState
             .subscribe(
                 { viewState.showSkin(it) },
+                { Timber.e(it) }
+            )
+            .connect()
+
+        traininigListener.listen()
+            .doOnSubscribe { viewState.showDistance("%.1f".format(0.0), challengeDistance) }
+            .subscribe(
+                { viewState.showDistance("%.1f".format(it), challengeDistance) },
                 { Timber.e(it) }
             )
             .connect()
@@ -115,14 +112,13 @@ class RunPresenter @Inject constructor(
                     val m = challenge.time % 100
 
                     if (challenge.id != ChallengeController.EMPTY.id) {
-                        isComplete =
-                                (currentDistance >= challenge.distance && initTime <= m * 60 + h * 3600)
+                        isComplete = (currentDistance >= challenge.distance && initTime <= m * 60 + h * 3600)
                         timeOut = initTime >= m * 60 + h * 3600
                     }
 
                     viewState.showSpeed(
-                        if ((initTime - lastTime).toFloat() / 3600 > 0) (lastDistance / 1000) / ((initTime - lastTime).toFloat() / 3600) else 0f,
-                        if (initTime.toFloat() / 3600 > 0) currentDistance / (initTime.toFloat() / 3600) else 0f
+                        if ((initTime - lastTime).toFloat()/3600 > 0) (lastDistance/1000)/((initTime - lastTime).toFloat()/3600) else 0f,
+                        if (initTime.toFloat()/3600 > 0) currentDistance/(initTime.toFloat()/3600) else 0f
                     )
                 },
                 { Timber.e(it) }
@@ -137,11 +133,13 @@ class RunPresenter @Inject constructor(
     }
 
     fun onStartClicked() {
-        isRun = !isRun
-        viewState.run(isRun)
-        if (isRun) {
+        traininigListener.isRun = !traininigListener.isRun
+
+        if (traininigListener.isRun) {
             startTimer()
+            viewState.run(true)
         } else {
+            viewState.run(false)
             timerDisposable?.dispose()
         }
     }
@@ -187,6 +185,30 @@ class RunPresenter @Inject constructor(
             navigationController.open(1)
             return
         }
+
+        router.exit()
+    }
+
+    private fun saveToSP(award: CatView.Skins) {
+        val availableSkins = mutableListOf<CatView.Skins>()
+        availableSkins.addAll(authData.availableSkins)
+        availableSkins.add(award)
+
+            ChallengeController.getAward(challenge)?.let { award ->
+                saveToSP(award)
+
+                saveToDB(award)
+            }
+
+            authData.availableSkins = availableSkins
+
+            navigationController.open(1)
+        }
+
+        Completable.fromCallable { database.locationDao.clear() }
+            .subscribeOn(schedulers.io())
+            .subscribe({}, { Timber.e(it) })
+            .connect()
 
         router.exit()
     }
