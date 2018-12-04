@@ -7,13 +7,14 @@ import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.MvpView
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.FirebaseAuth
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import ru.terrakok.cicerone.commands.Command
 import toothpick.Toothpick
 import javax.inject.Inject
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 class AppActivity : MvpAppCompatActivity(), MvpView {
 
@@ -52,7 +53,7 @@ class AppActivity : MvpAppCompatActivity(), MvpView {
         if (savedInstanceState == null) {
             val account = GoogleSignIn.getLastSignedInAccount(this)
 
-            if (account != null) {
+            if (account != null && FirebaseAuth.getInstance().currentUser != null) {
                 presenter.initMainScreen(account)
             } else {
                 presenter.initAuthScreen()
