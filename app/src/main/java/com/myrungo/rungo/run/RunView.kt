@@ -17,4 +17,6 @@ interface RunView : MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun showDialog(title: String, msg: String, tag: String)
+
+    fun showMessage(message: String?)
 }
