@@ -1,10 +1,14 @@
 package com.myrungo.rungo.run
 
+import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PolylineOptions
 import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
@@ -106,5 +110,52 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
 
     override fun onBackPressed() {
         presenter.onStopClicked()
+    }
+
+    override fun drawRoute(location: Location) {
+        //val polylineOptions = PolylineOptions().width(10f).color(Color.YELLOW)
+        //polylineOptions.add(lastLatLng, LatLng(location.getLatitude(), location.getLongitude()))
+        //val polyline = map.addPolyline(polylineOptions)
+        //map.addPolyline(polylineOptions)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        map_view.onCreate(savedInstanceState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        map_view.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        map_view.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        map_view.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        map_view.onStop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        map_view.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        map_view.onSaveInstanceState(outState)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        map_view.onLowMemory()
     }
 }

@@ -1,5 +1,8 @@
 package com.myrungo.rungo.run
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.location.Location
 import com.arellomobile.mvp.InjectViewState
 import com.google.android.gms.location.LocationRequest
@@ -31,9 +34,6 @@ class RunPresenter @Inject constructor(
     private val schedulers: SchedulersProvider,
     private val authData: AuthHolder
 ) : BasePresenter<RunView>() {
-    private val req = LocationRequest.create()
-        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-        .setInterval(LOCATION_UPDATE_INTERVAL)
 
     private var currentTab = 0
     private var isRun = false
@@ -56,27 +56,6 @@ class RunPresenter @Inject constructor(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-
-        locationProvider.getUpdatedLocation(req)
-            .filter { isRun }
-            .observeOn(schedulers.ui())
-            .doOnSubscribe {  viewState.showDistance("0,0", challengeDistance) }
-            .subscribe(
-                { location ->
-                    val temp = currentLocation
-                    currentLocation = location
-
-                    val distance = if (temp != null) currentLocation?.distanceTo(temp) ?: 0f else 0f
-                    lastDistance = distance
-                    lastTime = initTime
-                    currentDistance += if (distance > 0) distance/1000 else 0f
-                    viewState.showDistance("%.1f".format(currentDistance), challengeDistance)
-
-                    authData.distance = authData.distance + currentDistance
-                },
-                { Timber.e(it) }
-            )
-            .connect()
 
         catController.skinState
             .subscribe(
@@ -190,5 +169,13 @@ class RunPresenter @Inject constructor(
     companion object {
         private const val LOCATION_UPDATE_INTERVAL = 100L
         private const val DIALOG_TAG = "rp_dialog_tag"
+    }
+
+    private inner class MyReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val location = intent.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
+            val distance = intent.getDoubleExtra(LocationService.EXTRA_DISTANCE, 0.0)
+            viewState.showDistance("%.1f".format(distance), challengeDistance)
+        }
     }
 }
