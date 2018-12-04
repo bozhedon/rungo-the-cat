@@ -1,6 +1,9 @@
 package com.myrungo.rungo.profile
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.view.View
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.bumptech.glide.Glide
@@ -20,7 +23,7 @@ class ProfileFragment : BaseFragment(), ProfileView {
     @ProvidePresenter
     fun providePresenter() = Toothpick
         .openScope(Scopes.APP)
-        .getInstance(ProfilePresenter::class.java)
+        .getInstance(ProfilePresenter::class.java)!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -34,9 +37,15 @@ class ProfileFragment : BaseFragment(), ProfileView {
             .into(profile_cat_image)
     }
 
-    override fun showDetails(name: String, distance: Float) {
+    override fun onResume() {
+        super.onResume()
+        presenter.showInfo()
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun showDetails(name: String, distance: Double) {
         profile_name.text = name
-        profile_total_distance.text = getString(R.string.distance, distance)
+        profile_total_distance.text = distance.toString().take(5) + " км"
     }
 
     override fun showTab(position: Int) {
@@ -50,5 +59,17 @@ class ProfileFragment : BaseFragment(), ProfileView {
 
     override fun onBackPressed() {
         presenter.onBackPressed()
+    }
+
+    override fun showMessage(message: String?) {
+        if (message != null) {
+            activity?.let {
+                Snackbar.make(
+                    it.findViewById<View>(android.R.id.content),
+                    message,
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 }

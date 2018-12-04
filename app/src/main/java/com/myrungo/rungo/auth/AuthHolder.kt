@@ -7,9 +7,9 @@ interface AuthHolder {
     var name: String
     var distance: Double
     // distance
-    var distanceWeek: Double
-    var distanceMonth: Double
-    var distanceYear: Double
+    var weekDistance: Double
+    var monthDistance: Double
+    var yearDistance: Double
 
     var availableSkins: List<CatView.Skins>
     var currentSkin: CatView.Skins

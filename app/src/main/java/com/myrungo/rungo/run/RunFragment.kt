@@ -58,7 +58,7 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
         timer_challenge.visible(challengeTime.isNotEmpty())
     }
 
-    override fun showSpeed(curSpeed: Float, avgSpeed: Float) {
+    override fun showSpeed(curSpeed: Double, avgSpeed: Double) {
         speed.text = getString(R.string.speed, curSpeed)
         average_speed.text = getString(R.string.avg_speed, avgSpeed)
     }

@@ -10,11 +10,16 @@ import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.challenge.ChallengeItem
-import com.myrungo.rungo.constants.*
+import com.myrungo.rungo.constants.challengesCollection
+import com.myrungo.rungo.constants.trainingsCollection
+import com.myrungo.rungo.constants.userTotalDistanceKey
+import com.myrungo.rungo.constants.usersCollection
 import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.SchedulersProvider
 import com.myrungo.rungo.model.database.AppDatabase
 import com.myrungo.rungo.model.location.TraininigListener
+import com.myrungo.rungo.profile.stats.models.Challenge
+import com.myrungo.rungo.profile.stats.models.Training
 import com.myrungo.rungo.toTime
 import io.reactivex.Completable
 import durdinapps.rxfirebase2.RxFirestore
@@ -44,6 +49,15 @@ class RunPresenter @Inject constructor(
     private var isComplete = false
     private var timeOut = false
     private var currentDistance = 0f
+
+    private var totalDistance = 0.0
+
+    private var startTime: Long = 0
+    private var endTime: Long = 0
+
+    private var avgSpeed = 0.0
+
+    private var curSpeed = 0.0
 
     private val challengeTime =
         if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time / 100}:${challenge.time % 100}"
@@ -172,6 +186,8 @@ class RunPresenter @Inject constructor(
     }
 
     fun exit() {
+        saveTotalDistanceToDB()
+
         if (isComplete && challenge.id != ChallengeController.EMPTY.id) {
             challengeController.finishChallenge(challenge)
 
@@ -183,6 +199,8 @@ class RunPresenter @Inject constructor(
 
             navigationController.open(1)
             return
+        } else if () {
+
         }
 
         Completable.fromCallable { database.locationDao.clear() }
@@ -193,7 +211,60 @@ class RunPresenter @Inject constructor(
         router.exit()
     }
 
-    private fun saveToSP(award: CatView.Skins) {
+    private fun saveTotalDistanceToDB() {
+        RxFirestore.updateDocument(currentUserDocument, userTotalDistanceKey, authData.distance)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    viewState.showMessage(it.message)
+                    report(it)
+                    router.exit()
+                }
+            )
+            .connect()
+    }
+
+    private val currentUser
+        get() = FirebaseAuth.getInstance().currentUser!!
+
+    private val currentUserDocument
+        get() = FirebaseFirestore.getInstance()
+            .collection(usersCollection)
+            .document(currentUser.uid)
+
+    private val currentUserChallengesCollection
+        get() = currentUserDocument
+            .collection(challengesCollection)
+
+    private val currentUserTrainingsCollection
+        get() = currentUserDocument
+            .collection(trainingsCollection)
+
+    private fun saveTrainingToDB() {
+        val trainingInfo = Training(
+            distance = totalDistance,
+            startTime = startTime,
+            endTime = endTime,
+            averageSpeed = avgSpeed
+        )
+
+        RxFirestore.addDocument(currentUserTrainingsCollection, trainingInfo)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { router.exit() },
+                {
+                    viewState.showMessage(it.message)
+                    report(it)
+                    router.exit()
+                }
+            )
+            .connect()
+    }
+
+    private fun saveChallengeToSP(award: CatView.Skins) {
         val availableSkins = mutableListOf<CatView.Skins>()
         availableSkins.addAll(authData.availableSkins)
         availableSkins.add(award)
@@ -201,42 +272,36 @@ class RunPresenter @Inject constructor(
         authData.availableSkins = availableSkins
     }
 
-    private fun saveToDB(award: CatView.Skins) {
-        FirebaseAuth.getInstance().currentUser?.let { currentUser ->
-            val challengeInfo = mutableMapOf<String, Any>()
+    private fun saveChallengeToDB(award: CatView.Skins) {
+        val hour = initTime / 3600
+        val minutes = initTime / 60
 
-            val hour = initTime / 3600
-            val minutes = initTime / 60
+        val challengeInfo = Challenge(
+            distance = totalDistance,
+            hour = hour,
+            id = challenge.id,
+            imgURL = "",
+            isComplete = isComplete,
+            minutes = minutes,
+            reward = award.name,
+            startTime = startTime,
+            endTime = endTime,
+            averageSpeed = avgSpeed
+        )
 
-            challengeInfo[challengeDistanceKey] = currentDistance
-            challengeInfo[challengeHourKey] = hour
-            challengeInfo[challengeIdKey] = challenge.id
-            challengeInfo[challengeImgURLKey] = ""
-            challengeInfo[challengeIsCompleteKey] = isComplete
-            challengeInfo[challengeMinutesKey] = minutes
-            challengeInfo[challengeRewardKey] = award.name
-
-            val collectionReference = FirebaseFirestore.getInstance()
-                .collection(usersCollection)
-                .document(currentUser.uid)
-                .collection(challengesCollection)
-
-            RxFirestore.addDocument(collectionReference, challengeInfo)
-                .subscribeOn(schedulers.io())
-                .observeOn(schedulers.ui())
-                .subscribe(
-                    {
-                        router.exit()
-                    },
-                    {
-                        Timber.e(it)
-                        reportError(it)
-                        viewState.showMessage(it.message)
-                        router.exit()
-                    }
-                )
-                .connect()
-        }
+        RxFirestore.addDocument(currentUserChallengesCollection, challengeInfo)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { router.exit() },
+                {
+                    Timber.e(it)
+                    report(it)
+                    viewState.showMessage(it.message)
+                    router.exit()
+                }
+            )
+            .connect()
     }
 
     override fun onDestroy() {

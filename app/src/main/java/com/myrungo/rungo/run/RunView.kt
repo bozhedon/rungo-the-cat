@@ -14,7 +14,7 @@ interface RunView : MvpView {
     fun showSkin(skin: CatView.Skins)
     fun showMap(show: Boolean)
     fun showTime(curTime: String, challengeTime: String)
-    fun showSpeed(curSpeed: Float, avgSpeed: Float)
+    fun showSpeed(curSpeed: Double, avgSpeed: Double)
     fun showDistance(curDistance: String, challengeDistance: String)
     fun run(isRun: Boolean)
 
