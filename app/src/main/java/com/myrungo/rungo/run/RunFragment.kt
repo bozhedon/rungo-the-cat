@@ -8,13 +8,16 @@ import android.support.design.widget.Snackbar
 import android.view.View
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.cat.CatView
+import com.myrungo.rungo.model.database.entity.LocationDb
 import com.myrungo.rungo.model.location.LocationService
 import com.myrungo.rungo.run.alert.AlertFragment
 import com.myrungo.rungo.visible
@@ -24,6 +27,7 @@ import toothpick.Toothpick
 class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMapReadyCallback {
     override val layoutRes = R.layout.fragment_run
     private var map: GoogleMap? = null
+    private var lastLatLng: LatLng? = null
 
     @InjectPresenter
     lateinit var presenter: RunPresenter
@@ -133,11 +137,17 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
         presenter.onStopClicked()
     }
 
-    override fun drawRoute(location: Location) {
-//        val polylineOptions = PolylineOptions().width(10f).color(Color.YELLOW)
-//        polylineOptions.add(lastLatLng, LatLng(location.getLatitude(), location.getLongitude()))
-//        val polyline = map.addPolyline(polylineOptions)
-//        map?.addPolyline(polylineOptions)
+    override fun drawRoute(locationDb: LocationDb) {
+        if (lastLatLng == null) {
+            lastLatLng = LatLng(locationDb.latitude, locationDb.longitude)
+            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationDb.latitude, locationDb.longitude), 17f))
+        } else {
+            val polylineOptions = PolylineOptions().width(10f).color(Color.YELLOW)
+            polylineOptions.add(lastLatLng, LatLng(locationDb.latitude, locationDb.longitude))
+            map?.addPolyline(polylineOptions)
+            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationDb.latitude, locationDb.longitude), 17f))
+            lastLatLng = LatLng(locationDb.latitude, locationDb.longitude)
+        }
     }
 
     override fun onResume() {

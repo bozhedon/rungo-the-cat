@@ -71,7 +71,7 @@ class RunPresenter @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { location ->
-                    //TODO отображать метки
+                    viewState.drawRoute(location)
                 },
                 { Timber.e(it) }
             )

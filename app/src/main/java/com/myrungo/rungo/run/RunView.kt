@@ -5,7 +5,9 @@ import com.arellomobile.mvp.MvpView
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
+import com.google.android.gms.maps.model.LatLng
 import com.myrungo.rungo.cat.CatView
+import com.myrungo.rungo.model.database.entity.LocationDb
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface RunView : MvpView {
@@ -17,7 +19,7 @@ interface RunView : MvpView {
     fun run(isRun: Boolean)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun drawRoute (location: Location)
+    fun drawRoute (locationDb: LocationDb)
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun showDialog(title: String, msg: String, tag: String)
 
