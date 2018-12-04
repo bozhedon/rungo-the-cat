@@ -131,7 +131,7 @@ public class LocationService extends Service {
                             .subscribe()
             );
 
-            trainingListener.send(mDistance, location.getSpeed());
+            trainingListener.send(mDistance, mLocation.getSpeed());
             mNotificationManager.notify(NOTIFICATION_ID, getNotification());
         }
     }
@@ -140,8 +140,8 @@ public class LocationService extends Service {
         Intent intent = new Intent(this, AppActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle("Идёт пробежка")
-                .setContentText(String.valueOf(mDistance))
+                .setContentTitle("Дистанция:")
+                .setContentText(String.valueOf(mDistance.intValue()) + " " + getString(R.string.meter))
                 .setOngoing(true)
                 .setContentIntent(pendingIntent)
                 .setPriority(Notification.PRIORITY_HIGH)

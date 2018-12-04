@@ -44,19 +44,15 @@ class RunPresenter @Inject constructor(
 
     private var currentTab = 0
     private var timerDisposable: Disposable? = null
-    private var initTime = 0
+    /**в секундах*/
+    private var timeInSeconds = 0
     private var isComplete = false
     private var timeOut = false
-    private var currentDistance = 0f
-
-    private var totalDistance = 0.0
+    /**в метрах*/
+    private var distanceInMeters = 0.0
 
     private var startTime: Long = 0
     private var endTime: Long = 0
-
-    private var avgSpeed = 0.0
-
-    private var curSpeed = 0.0
 
     private val challengeTime =
         if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time / 100}:${challenge.time % 100}"
@@ -95,12 +91,12 @@ class RunPresenter @Inject constructor(
             }
             .subscribe(
                 {
-                    currentDistance = it.distance.toFloat() / 1000
+                    distanceInMeters = it.distance / 1000
 
-                    if (initTime != 0) {
+                    if (timeInSeconds != 0) {
                         viewState.showSpeed(
                             it.speed.toFloat() * 3.6,
-                            it.distance.toFloat() * 3.6 / initTime
+                            it.distance.toFloat() * 3.6 / timeInSeconds
                         )
                     }
                     viewState.showDistance("%.3f".format(it.distance / 1000), challengeDistance)
@@ -120,7 +116,7 @@ class RunPresenter @Inject constructor(
             .observeOn(schedulers.ui())
             .doOnSubscribe {
                 viewState.showTime(
-                    if (initTime != 0) initTime.toTime() else "00:00:00",
+                    if (timeInSeconds != 0) timeInSeconds.toTime() else "00:00:00",
                     challengeTime
                 )
                 viewState.showSpeed(0.0, 0.0)
@@ -129,16 +125,16 @@ class RunPresenter @Inject constructor(
             }
             .subscribe(
                 {
-                    initTime++
-                    viewState.showTime(initTime.toTime(), challengeTime)
+                    timeInSeconds++
+                    viewState.showTime(timeInSeconds.toTime(), challengeTime)
 
                     val h = challenge.time / 100
                     val m = challenge.time % 100
 
                     if (challenge.id != ChallengeController.EMPTY.id) {
                         isComplete =
-                                (currentDistance >= challenge.distance && initTime <= m * 60 + h * 3600)
-                        timeOut = initTime >= m * 60 + h * 3600
+                                (distanceInMeters >= challenge.distance && timeInSeconds <= m * 60 + h * 3600)
+                        timeOut = timeInSeconds >= m * 60 + h * 3600
                     }
                 },
                 { Timber.e(it) }
@@ -223,7 +219,15 @@ class RunPresenter @Inject constructor(
     }
 
     private fun saveTotalDistanceToDB() {
-        RxFirestore.updateDocument(currentUserDocument, userTotalDistanceKey, authData.distance)
+        val km = distanceInMeters / 1000
+
+        authData.totalDistance += km
+
+        RxFirestore.updateDocument(
+            currentUserDocument,
+            userTotalDistanceKey,
+            authData.totalDistance
+        )
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
             .subscribe(
@@ -254,8 +258,14 @@ class RunPresenter @Inject constructor(
             .collection(trainingsCollection)
 
     private fun saveTrainingToDB() {
+        val km = distanceInMeters / 1000
+
+        val hours = timeInSeconds / 3600
+
+        val avgSpeed = if (hours == 0) 0.0 else km / hours.toDouble()
+
         val trainingInfo = Training(
-            distance = totalDistance,
+            distance = km,
             startTime = startTime,
             endTime = endTime,
             averageSpeed = avgSpeed
@@ -284,12 +294,17 @@ class RunPresenter @Inject constructor(
     }
 
     private fun saveChallengeToDB(award: CatView.Skins) {
-        val hour = initTime / 3600
-        val minutes = initTime / 60
+        val minutes = timeInSeconds / 60
+
+        val km = distanceInMeters / 1000
+
+        val hours = timeInSeconds / 3600
+
+        val avgSpeed = if (hours == 0) 0.0 else km / hours.toDouble()
 
         val challengeInfo = Challenge(
-            distance = totalDistance,
-            hour = hour,
+            distance = km,
+            hour = hours,
             id = challenge.id,
             imgURL = "",
             isComplete = isComplete,

@@ -105,7 +105,7 @@ class AuthPresenter @Inject constructor(
             age = 0,
             costume = authData.currentSkin.name,
             height = 0,
-            totalDistance = authData.distance
+            totalDistance = authData.totalDistance
         )
 
         val documentReference = FirebaseFirestore.getInstance()

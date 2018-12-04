@@ -5,7 +5,8 @@ import com.myrungo.rungo.challenge.ChallengeItem
 
 interface AuthHolder {
     var name: String
-    var distance: Double
+    /**в км*/
+    var totalDistance: Double
     // distance
     var weekDistance: Double
     var monthDistance: Double
