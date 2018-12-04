@@ -4,9 +4,9 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <uses-feature
@@ -37,6 +37,7 @@
 
         <activity android:name=".AppActivity"
                   android:theme="@style/AppTheme.Splash"
+                  android:launchMode="singleTop"
                   android:screenOrientation="portrait"
                   android:windowSoftInputMode="stateHidden">
 

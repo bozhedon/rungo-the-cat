@@ -53,6 +53,8 @@ class RunPresenter @Inject constructor(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
 
+        traininigListener.isRun = false
+
         database.locationDao.listenLastLocation()
             .observeOn(schedulers.ui())
             .subscribe(
@@ -66,6 +68,14 @@ class RunPresenter @Inject constructor(
         catController.skinState
             .subscribe(
                 { viewState.showSkin(it) },
+                { Timber.e(it) }
+            )
+            .connect()
+
+        traininigListener.listen()
+            .doOnSubscribe { viewState.showDistance("%.1f".format(0.0), challengeDistance) }
+            .subscribe(
+                { viewState.showDistance("%.1f".format(it), challengeDistance) },
                 { Timber.e(it) }
             )
             .connect()
