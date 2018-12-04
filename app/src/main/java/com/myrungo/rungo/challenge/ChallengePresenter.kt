@@ -28,9 +28,9 @@ class ChallengePresenter @Inject constructor(
                     viewState.showData(
                         listOf(
                             HeaderItem(resourceManager.getString(R.string.choose_challenge)),
-                            ChallengeItem(0, 5, 30, R.drawable.bad_cat_jacket, if (it.id == 0) 1 else 0),
-                            ChallengeItem(1, 10, 40, R.drawable.bussiness_cat_cloth, if (it.id == 1) 1 else 0),
-                            ChallengeItem(2, 15, 130, R.drawable.karate_cat_kimono, if (it.id == 2) 1 else 0)
+                            ChallengeItem(0, 5, 30, R.drawable.bad_cat_jacket, it.id == 0),
+                            ChallengeItem(1, 10, 40, R.drawable.bussiness_cat_cloth, it.id == 1),
+                            ChallengeItem(2, 15, 130, R.drawable.karate_cat_kimono, it.id == 2)
                         )
                     )
                 },
@@ -41,15 +41,30 @@ class ChallengePresenter @Inject constructor(
         viewState.showData(
             listOf(
                 HeaderItem(resourceManager.getString(R.string.choose_challenge)),
-                ChallengeItem(0, 5, 30, R.drawable.bad_cat_jacket, if (authData.availableSkins.find { it == CatView.Skins.BAD } != null) 1 else 0),
-                ChallengeItem(1, 10, 40, R.drawable.bussiness_cat_cloth, if (authData.availableSkins.find { it == CatView.Skins.BUSINESS } != null) 1 else 0),
-                ChallengeItem(2, 15, 130, R.drawable.karate_cat_kimono, if (authData.availableSkins.find { it == CatView.Skins.KARATE } != null) 1 else 0)
+                ChallengeItem(
+                    0,
+                    5,
+                    30,
+                    R.drawable.bad_cat_jacket,
+                    authData.availableSkins.find { it == CatView.Skins.BAD } != null),
+                ChallengeItem(
+                    1,
+                    10,
+                    40,
+                    R.drawable.bussiness_cat_cloth,
+                    authData.availableSkins.find { it == CatView.Skins.BUSINESS } != null),
+                ChallengeItem(
+                    2,
+                    15,
+                    130,
+                    R.drawable.karate_cat_kimono,
+                    authData.availableSkins.find { it == CatView.Skins.KARATE } != null)
             )
         )
     }
 
     fun onChallengeClicked(challenge: ChallengeItem) {
-        if (challenge.isComplete == 1) return
+        if (challenge.isComplete) return
 
         viewState.showAcceptDialog(challenge)
     }

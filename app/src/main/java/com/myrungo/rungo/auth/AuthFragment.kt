@@ -51,8 +51,19 @@ class AuthFragment : BaseFragment(), AuthView {
     override fun handleSignInError(error: FirebaseUiException) {
         val errorCode = error.errorCode
 
+        if (errorCode == NO_NETWORK) {
+            Snackbar.make(
+                activity!!.findViewById<View>(android.R.id.content),
+                context!!.getString(R.string.no_internet_connection),
+                Snackbar.LENGTH_INDEFINITE
+            ).setAction("Повторить?") {
+                signIn()
+            }.show()
+
+            return
+        }
+
         val message = when (errorCode) {
-            NO_NETWORK -> context!!.getString(R.string.no_internet_connection)
             PLAY_SERVICES_UPDATE_CANCELLED -> context!!.getString(R.string.play_services_update_cancelled)
             DEVELOPER_ERROR -> context!!.getString(R.string.developer_error)
             PROVIDER_ERROR -> context!!.getString(R.string.provider_error)
@@ -64,16 +75,20 @@ class AuthFragment : BaseFragment(), AuthView {
 
         reportError(error)
 
-        showMessage(message)
+        Snackbar.make(
+            activity!!.findViewById<View>(android.R.id.content),
+            message,
+            Snackbar.LENGTH_INDEFINITE
+        ).setAction("Повторить?") {
+            signIn()
+        }.show()
     }
 
     override fun showMessage(message: String?) {
         if (message != null) {
-            val activity = activity
-
-            if (activity != null) {
+            activity?.let {
                 Snackbar.make(
-                    activity.findViewById<View>(android.R.id.content),
+                    it.findViewById<View>(android.R.id.content),
                     message,
                     Snackbar.LENGTH_LONG
                 ).show()

@@ -3,11 +3,12 @@ package com.myrungo.rungo.profile
 import com.arellomobile.mvp.InjectViewState
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.R
+import com.myrungo.rungo.Screens
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.model.MainNavigationController
-import com.myrungo.rungo.model.ResourceManager
+import com.myrungo.rungo.utils.NetworkManager
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,15 +16,25 @@ import javax.inject.Inject
 @InjectViewState
 class ProfilePresenter @Inject constructor(
     private val router: Router,
-    private val resourceManager: ResourceManager,
     private val navigation: MainNavigationController,
     private val catController: CatController,
-    private val authData: AuthHolder
-): BasePresenter<ProfileView>() {
+    private val authData: AuthHolder,
+    private val networkManager: NetworkManager
+) : BasePresenter<ProfileView>() {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
 
+        if (!networkManager.isConnectedToInternet) {
+            viewState.showMessage("Необходимо интернет соединение")
+            router.navigateTo(Screens.MainFlow)
+            return
+        }
+
+        viewState.showTab(0)
+    }
+
+    fun showInfo() {
         catController.skinState
             .subscribe(
                 { handleSkin(it) },
@@ -31,12 +42,7 @@ class ProfilePresenter @Inject constructor(
             )
             .connect()
 
-        viewState.showDetails(
-            authData.name,
-            authData.distance.toFloat()
-        )
-
-        viewState.showTab(0)
+        viewState.showDetails(authData.name, authData.distance)
     }
 
     fun onTabClicked(position: Int) {

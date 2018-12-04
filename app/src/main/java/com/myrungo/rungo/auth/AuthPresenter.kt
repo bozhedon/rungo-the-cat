@@ -12,8 +12,8 @@ import com.myrungo.rungo.AppActivity
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.Screens
 import com.myrungo.rungo.cat.CatController
-import com.myrungo.rungo.constants.emailKey
-import com.myrungo.rungo.constants.phoneNumberKey
+import com.myrungo.rungo.constants.userEmailKey
+import com.myrungo.rungo.constants.userPhoneNumberKey
 import com.myrungo.rungo.constants.usersCollection
 import com.myrungo.rungo.model.FlowRouter
 import com.myrungo.rungo.model.SchedulersProvider
@@ -98,8 +98,8 @@ class AuthPresenter @Inject constructor(
 
         newUserInfo["reg_date"] = creationTimestamp
         newUserInfo["name"] = displayName
-        newUserInfo[emailKey] = email
-        newUserInfo[phoneNumberKey] = phoneNumber
+        newUserInfo[userEmailKey] = email
+        newUserInfo[userPhoneNumberKey] = phoneNumber
         newUserInfo["photoUri"] = photoUrl
         newUserInfo["uid"] = uid
         newUserInfo["isAnonymous"] = isAnonymous
@@ -124,7 +124,7 @@ class AuthPresenter @Inject constructor(
                 },
                 {
                     Timber.e(it)
-                    reportError(it)
+                    report(it)
                     viewState.showMessage(it.message)
                 }
             )

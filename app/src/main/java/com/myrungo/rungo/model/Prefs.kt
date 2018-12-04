@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.gson.Gson
@@ -35,8 +36,23 @@ class Prefs @Inject constructor(
     private fun getSharedPreferences(prefsName: String) =
         context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
 
+    private val currentUser
+        get() = FirebaseAuth.getInstance().currentUser
+            ?: throw RuntimeException("User must sign in app")
+
+    private val currentUserDocument
+        get() = FirebaseFirestore.getInstance()
+            .collection(usersCollection)
+            .document(currentUser.uid)
+
     override var name: String
-        get() = getSharedPreferences(AUTH_DATA).getString(KEY_NAME, null) ?: "User"
+        get() {
+            val name = getSharedPreferences(AUTH_DATA).getString(KEY_NAME, null) ?: "User"
+
+            checkNameMatch(name)
+
+            return name
+        }
         set(value) {
             getSharedPreferences(AUTH_DATA)
                 .edit()
@@ -44,9 +60,54 @@ class Prefs @Inject constructor(
                 .apply()
         }
 
+    @SuppressLint("CheckResult")
+    private fun checkNameMatch(name: String) {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForNameChange(it, name) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    private fun onGetUserDocumentForNameChange(documentSnapshot: DocumentSnapshot, spName: String) {
+        documentSnapshot.data?.let { data ->
+            data[userNameKey]?.toString()?.let { dbName ->
+                if (spName != dbName) {
+                    saveToDBTheName(spName)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveToDBTheName(nameValue: String) {
+        RxFirestore.updateDocument(currentUserDocument, userNameKey, nameValue)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
     override var distance: Double
-        get() = getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE, "0")?.toDoubleOrNull()
-            ?: 0.toDouble()
+        get() {
+            val distanceValue =
+                getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE, "0")?.toDoubleOrNull()
+                    ?: 0.toDouble()
+
+            checkDistanceValueMatch(distanceValue)
+
+            return distanceValue
+        }
         set(value) {
             getSharedPreferences(AUTH_DATA)
                 .edit()
@@ -54,9 +115,57 @@ class Prefs @Inject constructor(
                 .apply()
         }
 
-    override var distanceWeek: Double
-        get() = getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE_WEEK, "0")?.toDoubleOrNull()
-            ?: 0.toDouble()
+    @SuppressLint("CheckResult")
+    private fun checkDistanceValueMatch(distanceValue: Double) {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForDistanceChange(it, distanceValue) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    private fun onGetUserDocumentForDistanceChange(
+        documentSnapshot: DocumentSnapshot,
+        spDistanceValue: Double
+    ) {
+        documentSnapshot.data?.let { data ->
+            data[userTotalDistanceKey]?.toString()?.toDouble()?.let { dbDistanceValue ->
+                if (spDistanceValue != dbDistanceValue) {
+                    saveToDBTheDistanceValue(spDistanceValue)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveToDBTheDistanceValue(spDistanceValue: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userTotalDistanceKey, spDistanceValue)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    override var weekDistance: Double
+        get() {
+            val weekDistance =
+                getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE_WEEK, "0")?.toDoubleOrNull()
+                    ?: 0.toDouble()
+
+            checkWeekDistanceMatch(weekDistance)
+
+            return weekDistance
+        }
         set(value) {
             getSharedPreferences(AUTH_DATA)
                 .edit()
@@ -64,9 +173,59 @@ class Prefs @Inject constructor(
                 .apply()
         }
 
-    override var distanceMonth: Double
-        get() = getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE_MONTH, "0")?.toDoubleOrNull()
-            ?: 0.toDouble()
+    @SuppressLint("CheckResult")
+    private fun checkWeekDistanceMatch(spWeekDistance: Double) {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForWeekDistanceChange(it, spWeekDistance) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    private fun onGetUserDocumentForWeekDistanceChange(
+        documentSnapshot: DocumentSnapshot,
+        spWeekDistance: Double
+    ) {
+        documentSnapshot.data?.let { data ->
+            data[userWeekDistanceKey]?.toString()?.toDouble()?.let { dbWeekDistanceValue ->
+                if (spWeekDistance != dbWeekDistanceValue) {
+                    saveToDBTheWeekDistanceValue(spWeekDistance)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveToDBTheWeekDistanceValue(spWeekDistance: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userWeekDistanceKey, spWeekDistance)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    override var monthDistance: Double
+        get() {
+            val spMonthDistance = (getSharedPreferences(AUTH_DATA).getString(
+                KEY_DISTANCE_MONTH,
+                "0"
+            )?.toDoubleOrNull()
+                ?: 0.toDouble())
+
+            checkMonthDistanceMatch(spMonthDistance)
+
+            return spMonthDistance
+        }
         set(value) {
             getSharedPreferences(AUTH_DATA)
                 .edit()
@@ -74,15 +233,104 @@ class Prefs @Inject constructor(
                 .apply()
         }
 
-    override var distanceYear: Double
-        get() = getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE_YEAR, "0")?.toDoubleOrNull()
-            ?: 0.toDouble()
+    @SuppressLint("CheckResult")
+    private fun checkMonthDistanceMatch(spMonthDistance: Double) {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForMonthDistanceChange(it, spMonthDistance) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    private fun onGetUserDocumentForMonthDistanceChange(
+        documentSnapshot: DocumentSnapshot,
+        spMonthDistance: Double
+    ) {
+        documentSnapshot.data?.let { data ->
+            data[userMonthDistanceKey]?.toString()?.toDouble()?.let { dbWeekDistanceValue ->
+                if (spMonthDistance != dbWeekDistanceValue) {
+                    saveToDBTheMonthDistanceValue(spMonthDistance)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveToDBTheMonthDistanceValue(spMonthDistance: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userMonthDistanceKey, spMonthDistance)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    override var yearDistance: Double
+        get() {
+            val spYearDistance =
+                (getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE_YEAR, "0")?.toDoubleOrNull()
+                    ?: 0.toDouble())
+
+            checkYearDistanceMatch(spYearDistance)
+
+            return spYearDistance
+        }
         set(value) {
             getSharedPreferences(AUTH_DATA)
                 .edit()
                 .putString(KEY_DISTANCE_YEAR, value.toString())
                 .apply()
         }
+
+    @SuppressLint("CheckResult")
+    private fun checkYearDistanceMatch(spYearDistance: Double) {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForYearDistanceChange(it, spYearDistance) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    private fun onGetUserDocumentForYearDistanceChange(
+        documentSnapshot: DocumentSnapshot,
+        spYearDistance: Double
+    ) {
+        documentSnapshot.data?.let { data ->
+            data[userYearDistanceKey]?.toString()?.toDouble()?.let { dbWeekDistanceValue ->
+                if (spYearDistance != dbWeekDistanceValue) {
+                    saveToDBTheYearDistanceValue(spYearDistance)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveToDBTheYearDistanceValue(spYearDistance: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userYearDistanceKey, spYearDistance)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
 
     override var availableSkins: List<CatView.Skins>
         get() = try {
@@ -105,26 +353,19 @@ class Prefs @Inject constructor(
 
     @SuppressLint("CheckResult")
     private fun checkSkinsMatch(availableSkins: List<CatView.Skins>) {
-        FirebaseAuth.getInstance().currentUser?.let { currentUser ->
-            val collectionReference = FirebaseFirestore.getInstance()
-                .collection(usersCollection)
-                .document(currentUser.uid)
-                .collection(challengesCollection)
-
-            RxFirestore.getCollection(collectionReference)
-                .subscribeOn(schedulers.io())
-                .subscribeOn(schedulers.ui())
-                .subscribe(
-                    { onGetChallengesCollection(it, availableSkins) },
-                    {
-                        Timber.e(it)
-                        reportError(it)
-                    }
-                )
-        }
+        RxFirestore.getCollection(currentUserChallengesCollection)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetChallengesCollectionForAvailableSkins(it, availableSkins) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
     }
 
-    private fun onGetChallengesCollection(
+    private fun onGetChallengesCollectionForAvailableSkins(
         snapshot: QuerySnapshot,
         availableSkins: List<CatView.Skins>
     ) {
@@ -145,45 +386,43 @@ class Prefs @Inject constructor(
         for (skinName in skinsThatDbDoesNotContain) {
             //shared preferences contains skin, that does not exist in DB
             availableSkins.find { it.name == skinName }?.let { skinForSave ->
-                saveToDBThisSkin(skinForSave)
+                saveToDBTheSkin(skinForSave)
             }
         }
     }
 
-    private fun saveToDBThisSkin(skinForSave: CatView.Skins) {
-        FirebaseAuth.getInstance().currentUser?.let { currentUser ->
-            val challengeInfo = mutableMapOf<String, Any>()
+    @SuppressLint("CheckResult")
+    private fun saveToDBTheSkin(skinForSave: CatView.Skins) {
+        val challengeInfo = mutableMapOf<String, Any>()
 
-            challengeInfo[challengeDistanceKey] = 0
-            challengeInfo[challengeHourKey] = 0
-            challengeInfo[challengeIdKey] = 0
-            challengeInfo[challengeImgURLKey] = ""
-            challengeInfo[challengeIsCompleteKey] = true
-            challengeInfo[challengeMinutesKey] = 0
-            challengeInfo[challengeRewardKey] = skinForSave.name
+        challengeInfo[challengeDistanceKey] = 0
+        challengeInfo[challengeHourKey] = 0
+        challengeInfo[challengeIdKey] = 0
+        challengeInfo[challengeImgURLKey] = ""
+        challengeInfo[challengeIsCompleteKey] = true
+        challengeInfo[challengeMinutesKey] = 0
+        challengeInfo[challengeRewardKey] = skinForSave.name
 
-            val collectionReference = FirebaseFirestore.getInstance()
-                .collection(usersCollection)
-                .document(currentUser.uid)
-                .collection(challengesCollection)
-
-            RxFirestore.addDocument(collectionReference, challengeInfo)
-                .subscribeOn(schedulers.io())
-                .observeOn(schedulers.ui())
-                .subscribe(
-                    { },
-                    {
-                        Timber.e(it)
-                        reportError(it)
-                    }
-                )
-        }
+        RxFirestore.addDocument(currentUserChallengesCollection, challengeInfo)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
     }
 
     override var currentSkin: CatView.Skins
         get() = try {
             val json = getSharedPreferences(AUTH_DATA).getString(KEY_CURRENT_SKIN, null)
-            gson.fromJson(json, CatView.Skins::class.java)
+            val spCurrentSkin = gson.fromJson(json, CatView.Skins::class.java)!!
+
+            checkCurrentSkinMatch(spCurrentSkin.name)
+
+            spCurrentSkin
         } catch (e: Exception) {
             CatView.Skins.COMMON
         }
@@ -194,11 +433,57 @@ class Prefs @Inject constructor(
                 .apply()
         }
 
+    @SuppressLint("CheckResult")
+    private fun checkCurrentSkinMatch(spCurrentSkin: String) {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForCurrentSkinChange(it, spCurrentSkin) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    private fun onGetUserDocumentForCurrentSkinChange(
+        documentSnapshot: DocumentSnapshot,
+        spCurrentSkin: String
+    ) {
+        documentSnapshot.data?.let { data ->
+            data[userCurrentSkinKey]?.toString()?.let { dbWeekDistanceValue ->
+                if (spCurrentSkin != dbWeekDistanceValue) {
+                    saveToDBTheCurrentSkinValue(spCurrentSkin)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveToDBTheCurrentSkinValue(spCurrentSkin: String) {
+        RxFirestore.updateDocument(currentUserDocument, userCurrentSkinKey, spCurrentSkin)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
     override var completedChallenges: List<ChallengeItem>
         get() = try {
             val json = getSharedPreferences(AUTH_DATA).getString(KEY_CHALLENGES, null)
             val jsonArray = gson.fromJson(json, JsonElement::class.java).asJsonArray
-            jsonArray.map { gson.fromJson(it, ChallengeItem::class.java) }
+            val spCompletedChallenges =
+                jsonArray.map { gson.fromJson(it, ChallengeItem::class.java) }
+
+            checkCompletedChallenges(spCompletedChallenges)
+
+            spCompletedChallenges
         } catch (e: Exception) {
             emptyList()
         }
@@ -208,6 +493,80 @@ class Prefs @Inject constructor(
                 .putString(KEY_CHALLENGES, gson.toJson(value))
                 .apply()
         }
+
+    private val currentUserChallengesCollection
+        get() = currentUserDocument.collection(challengesCollection)
+
+    @SuppressLint("CheckResult")
+    private fun checkCompletedChallenges(spCompletedChallenges: List<ChallengeItem>) {
+        RxFirestore.getCollection(currentUserChallengesCollection)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetChallengesCollectionForCompletedChallenges(it, spCompletedChallenges) },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
+
+    private fun onGetChallengesCollectionForCompletedChallenges(
+        snapshot: QuerySnapshot,
+        spCompletedChallengesList: List<ChallengeItem>
+    ) {
+        val dbChallenges = mutableSetOf<Pair<Int, Boolean>>()
+
+        for (document in snapshot.documents) {
+            document.data?.let { data ->
+                val dbIsComplete = data[challengeIsCompleteKey]?.toString()?.toBoolean()
+                val dbID = data[challengeIdKey]?.toString()?.toIntOrNull()
+
+                if (dbIsComplete != null && dbID != null) {
+                    dbChallenges += dbID to dbIsComplete
+                }
+            }
+        }
+
+        val spCompletedChallenges = spCompletedChallengesList.map { it.id to it.isComplete }.toSet()
+
+        val completedChallengesThatDbDoesNotContain = spCompletedChallenges.minus(dbChallenges)
+
+        for (completedChallenge in completedChallengesThatDbDoesNotContain) {
+            //shared preferences contains completed challenge, that does not exist in DB
+            saveToDBCompletedChallenge(
+                completedChallenge,
+                spCompletedChallengesList.find { completedChallenge.first == it.id }!!
+            )
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveToDBCompletedChallenge(
+        completedChallenge: Pair<Int, Boolean>,
+        completedChallengeItem: ChallengeItem
+    ) {
+        val challengeInfo = mutableMapOf<String, Any>()
+
+        challengeInfo[challengeDistanceKey] = 0
+        challengeInfo[challengeHourKey] = 0
+        challengeInfo[challengeIdKey] = completedChallenge.first
+        challengeInfo[challengeImgURLKey] = ""
+        challengeInfo[challengeIsCompleteKey] = completedChallenge.second
+        challengeInfo[challengeMinutesKey] = 0
+        challengeInfo[challengeRewardKey] = completedChallengeItem.awardRes
+
+        RxFirestore.addDocument(currentUserChallengesCollection, challengeInfo)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                }
+            )
+    }
 
     private fun reportError(throwable: Throwable) {
         Crashlytics.logException(throwable)

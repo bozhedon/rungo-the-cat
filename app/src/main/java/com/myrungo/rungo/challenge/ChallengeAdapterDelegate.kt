@@ -10,7 +10,8 @@ import com.myrungo.rungo.inflate
 import com.myrungo.rungo.visible
 import kotlinx.android.synthetic.main.item_challenge.view.*
 
-class ChallengeAdapterDelegate(private val clickListener: (ChallengeItem) -> Unit = {}) : AdapterDelegate<MutableList<Any>>() {
+class ChallengeAdapterDelegate(private val clickListener: (ChallengeItem) -> Unit = {}) :
+    AdapterDelegate<MutableList<Any>>() {
 
     override fun isForViewType(items: MutableList<Any>, position: Int): Boolean =
         items[position] is ChallengeItem
@@ -39,14 +40,15 @@ class ChallengeAdapterDelegate(private val clickListener: (ChallengeItem) -> Uni
             val m = challenge.time % 100
 
             with(itemView) {
-                item_challenge_distance.text = context.getString(R.string.distance, challenge.distance.toFloat())
+                item_challenge_distance.text =
+                        context.getString(R.string.distance, challenge.distance.toFloat())
                 item_challenge_time.text = "$h:$m"
 
                 Glide.with(this)
                     .load(challenge.awardRes)
                     .into(item_challenge_award_image)
 
-                item_challenge_complete.visible(challenge.isComplete == 1)
+                item_challenge_complete.visible(challenge.isComplete)
             }
         }
     }
