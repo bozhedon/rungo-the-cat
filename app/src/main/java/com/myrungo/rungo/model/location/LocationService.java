@@ -109,31 +109,31 @@ public class LocationService extends Service {
             return;
         }
 
-        compositeDisposable.add(
-                Completable.fromAction(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        database.getLocationDao().insert(new LocationDb(location.getLatitude(), location.getLongitude(), 0));
-                    }
-                })
-                        .subscribeOn(schedulers.io())
-                        .doOnError(new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Timber.e(throwable);
-                            }
-                        })
-                        .subscribe()
-        );
-
         //proverka na tochnost
         if (location.distanceTo(mLocation) > location.getAccuracy() + mLocation.getAccuracy()) {
             mDistance += location.distanceTo(mLocation);
             mLocation = location;
-        }
 
-        mNotificationManager.notify(NOTIFICATION_ID, getNotification());
-        trainingListener.send(mDistance);
+            compositeDisposable.add(
+                    Completable.fromAction(new Action() {
+                        @Override
+                        public void run() throws Exception {
+                            database.getLocationDao().insert(new LocationDb(mLocation.getLatitude(), mLocation.getLongitude(), 0));
+                        }
+                    })
+                            .subscribeOn(schedulers.io())
+                            .doOnError(new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Exception {
+                                    Timber.e(throwable);
+                                }
+                            })
+                            .subscribe()
+            );
+
+            trainingListener.send(mDistance, location.getSpeed());
+            mNotificationManager.notify(NOTIFICATION_ID, getNotification());
+        }
     }
 
     private Notification getNotification() {
