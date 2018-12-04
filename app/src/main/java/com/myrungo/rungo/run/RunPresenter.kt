@@ -15,7 +15,6 @@ import com.myrungo.rungo.toTime
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
 import ru.terrakok.cicerone.Router
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -76,7 +75,7 @@ class RunPresenter @Inject constructor(
         traininigListener.listen()
             .doOnSubscribe { viewState.showDistance("%.1f".format(0.0), challengeDistance) }
             .subscribe(
-                { viewState.showDistance("%.1f".format(it), challengeDistance) },
+                { viewState.showDistance("%.3f".format(it/1000), challengeDistance) },
                 { Timber.e(it) }
             )
             .connect()
