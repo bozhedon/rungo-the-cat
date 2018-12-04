@@ -140,7 +140,7 @@ public class LocationService extends Service {
         Intent intent = new Intent(this, AppActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle("Дистанция:")
+                .setContentTitle(getString(R.string.notification_title))
                 .setContentText(String.valueOf(mDistance.intValue()) + " " + getString(R.string.meter))
                 .setOngoing(true)
                 .setContentIntent(pendingIntent)

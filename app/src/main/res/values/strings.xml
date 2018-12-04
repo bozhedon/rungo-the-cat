@@ -44,4 +44,5 @@
     <string name="tab_run">бег</string>
     <string name="tab_map">карта</string>
     <string name="meter">м</string>
+    <string name="notification_title">Пройдено:</string>
 </resources>
