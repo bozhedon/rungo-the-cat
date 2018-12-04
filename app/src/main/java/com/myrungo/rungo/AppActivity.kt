@@ -1,5 +1,6 @@
 package com.myrungo.rungo
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
@@ -9,6 +10,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
+import com.myrungo.rungo.model.location.LocationService
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
@@ -73,6 +75,11 @@ class AppActivity : MvpAppCompatActivity(), MvpView {
 
     override fun onBackPressed() {
         currentFragment?.onBackPressed() ?: super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        stopService(Intent(this, LocationService::class.java))
+        super.onDestroy()
     }
 
     companion object {

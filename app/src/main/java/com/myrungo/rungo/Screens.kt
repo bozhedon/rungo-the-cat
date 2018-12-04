@@ -6,7 +6,7 @@ import com.myrungo.rungo.auth.welcome.WelcomeFragment
 import com.myrungo.rungo.challenge.ChallengeFragment
 import com.myrungo.rungo.challenge.ChallengeItem
 import com.myrungo.rungo.customize.CustomizeFragment
-import com.myrungo.rungo.customize_done.CustomizeDoneFragment
+import com.myrungo.rungo.customize.done.CustomizeDoneFragment
 import com.myrungo.rungo.home.HomeFragment
 import com.myrungo.rungo.main.MainFlowFragment
 import com.myrungo.rungo.profile.ProfileFragment

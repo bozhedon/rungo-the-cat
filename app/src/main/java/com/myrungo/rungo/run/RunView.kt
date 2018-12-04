@@ -1,5 +1,6 @@
 package com.myrungo.rungo.run
 
+import android.location.Location
 import com.arellomobile.mvp.MvpView
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy
@@ -15,6 +16,8 @@ interface RunView : MvpView {
     fun showDistance(curDistance: String, challengeDistance: String)
     fun run(isRun: Boolean)
 
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun drawRoute (location: Location)
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun showDialog(title: String, msg: String, tag: String)
 
