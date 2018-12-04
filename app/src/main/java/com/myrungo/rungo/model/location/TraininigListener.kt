@@ -4,9 +4,9 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 
 class TraininigListener {
-    private val infoRelay = PublishRelay.create<Double>()
+    private val infoRelay = PublishRelay.create<TrainingInfo>()
     var isRun = false
 
-    fun listen(): Observable<Double> = infoRelay
-    fun send(distance: Double) = infoRelay.accept(distance)
+    fun listen(): Observable<TrainingInfo> = infoRelay
+    fun send(distance: Double, speed: Double) = infoRelay.accept(TrainingInfo(distance, speed))
 }

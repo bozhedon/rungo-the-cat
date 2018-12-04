@@ -39,8 +39,6 @@ class RunPresenter @Inject constructor(
     private var isComplete = false
     private var timeOut = false
     private var currentDistance = 0f
-    private var lastDistance = 0f
-    private var lastTime = 0
 
     private val challengeTime =
             if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time/100}:${challenge.time%100}"
@@ -73,9 +71,19 @@ class RunPresenter @Inject constructor(
             .connect()
 
         traininigListener.listen()
-            .doOnSubscribe { viewState.showDistance("%.1f".format(0.0), challengeDistance) }
+            .doOnSubscribe {
+                viewState.showSpeed(0f, 0f)
+                viewState.showDistance("%.1f".format(0.0), challengeDistance)
+            }
             .subscribe(
-                { viewState.showDistance("%.3f".format(it/1000), challengeDistance) },
+                {
+                    currentDistance = it.distance.toFloat()/1000
+                    
+                    if (initTime != 0) {
+                        viewState.showSpeed(it.speed.toFloat()*3.6f, it.distance.toFloat()*3.6f / initTime)
+                    }
+                    viewState.showDistance("%.3f".format(it.distance/1000), challengeDistance)
+                },
                 { Timber.e(it) }
             )
             .connect()
@@ -93,7 +101,6 @@ class RunPresenter @Inject constructor(
                     if (initTime != 0) initTime.toTime() else "00:00:00",
                     challengeTime
                 )
-                viewState.showSpeed(0f, 0f)
             }
             .subscribe(
                 {
@@ -107,11 +114,6 @@ class RunPresenter @Inject constructor(
                         isComplete = (currentDistance >= challenge.distance && initTime <= m * 60 + h * 3600)
                         timeOut = initTime >= m * 60 + h * 3600
                     }
-
-                    viewState.showSpeed(
-                        if ((initTime - lastTime).toFloat()/3600 > 0) (lastDistance/1000)/((initTime - lastTime).toFloat()/3600) else 0f,
-                        if (initTime.toFloat()/3600 > 0) currentDistance/(initTime.toFloat()/3600) else 0f
-                    )
                 },
                 { Timber.e(it) }
             )
