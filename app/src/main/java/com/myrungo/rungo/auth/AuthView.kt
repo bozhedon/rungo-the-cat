@@ -4,6 +4,7 @@ import com.arellomobile.mvp.MvpView
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
+import com.firebase.ui.auth.FirebaseUiException
 
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface AuthView : MvpView {
@@ -12,4 +13,7 @@ interface AuthView : MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun signIn()
+
+    fun handleSignInError(error: FirebaseUiException)
+    fun showMessage(message: String?)
 }

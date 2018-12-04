@@ -1,22 +1,23 @@
 package com.myrungo.rungo.auth
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.net.Uri
 import com.arellomobile.mvp.InjectViewState
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.AuthResult
+import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import com.myrungo.rungo.AppActivity
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.Screens
 import com.myrungo.rungo.cat.CatController
+import com.myrungo.rungo.constants.emailKey
+import com.myrungo.rungo.constants.phoneNumberKey
+import com.myrungo.rungo.constants.usersCollection
 import com.myrungo.rungo.model.FlowRouter
 import com.myrungo.rungo.model.SchedulersProvider
-import durdinapps.rxfirebase2.RxFirebaseAuth
-import io.reactivex.Completable
-import io.reactivex.Maybe
+import durdinapps.rxfirebase2.RxFirestore
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,56 +37,98 @@ class AuthPresenter @Inject constructor(
 
     fun handleAuthResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == AppActivity.RC_SIGN_IN) {
-            try {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(data)!!
-
-                task.getResult(ApiException::class.java)
-                    ?.let { account ->
-                        Completable
-                            .fromAction {
-                                authData.name = account.displayName ?: "User"
-                                //TODO
-                                authData.availableSkins = emptyList()
-                                authData.completedChallenges = emptyList()
-
-                                catController.setSkin(authData.currentSkin)
-                            }
-                            .subscribeOn(schedulers.io())
-                            .observeOn(schedulers.ui())
-                            .doOnSubscribe { viewState.showProgress(true) }
-                            .doAfterTerminate { viewState.showProgress(false) }
-                            .subscribe(
-                                {
-                                    firebaseAuthWithGoogle(account)
-                                        .subscribe(
-                                            {
-                                                router.newRootFlow(Screens.MainFlow)
-                                            },
-                                            {
-                                                Timber.e(it)
-                                            })
-                                },
-                                {
-                                    Timber.e(it)
-                                }
-                            )
-                            .connect()
-                    }
-            } catch (apiException: ApiException) {
-                Timber.e(apiException)
-                viewState.showButton(true)
+            if (resultCode == RESULT_OK) {
+                onOkResult()
+            } else {
+                onNotOkResult(IdpResponse.fromResultIntent(data))
             }
         } else {
-            viewState.showButton(true)
+            viewState.signIn()
         }
     }
 
-    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount): Maybe<AuthResult> {
-        Timber.d("firebaseAuthWithGoogle: ${account.id!!}")
+    private fun onNotOkResult(response: IdpResponse?) {
+        if (response == null) {
+            //the user canceled the sign-in flow using the back button
+            viewState.signIn()
+            return
+        }
 
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        val error = response.error
 
-        return RxFirebaseAuth.signInWithCredential(FirebaseAuth.getInstance(), credential)
+        if (error == null) {
+            viewState.signIn()
+            return
+        }
+
+        Timber.e(error)
+
+        viewState.handleSignInError(error)
+    }
+
+    private fun onOkResult() {
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user == null) {
+            viewState.signIn()
+        } else {
+            saveToDB(user)
+        }
+    }
+
+    private fun saveToDB(user: FirebaseUser) {
+        val metadata = user.metadata
+
+        val creationTimestamp = metadata?.creationTimestamp ?: System.currentTimeMillis()
+
+        val newUserInfo = mutableMapOf<String, Any>()
+
+        val email = user.email ?: ""
+        val displayName = user.displayName ?: ""
+        val phoneNumber = user.phoneNumber ?: ""
+        val photoUri = user.photoUrl ?: Uri.EMPTY
+        val uid = user.uid
+        val isAnonymous = user.isAnonymous
+
+        val providers = user.providers ?: emptyList()
+
+        val provider = if (providers.isEmpty()) "" else providers[0]
+
+        val photoUrl = photoUri.toString()
+
+        newUserInfo["reg_date"] = creationTimestamp
+        newUserInfo["name"] = displayName
+        newUserInfo[emailKey] = email
+        newUserInfo[phoneNumberKey] = phoneNumber
+        newUserInfo["photoUri"] = photoUrl
+        newUserInfo["uid"] = uid
+        newUserInfo["isAnonymous"] = isAnonymous
+        newUserInfo["provider"] = provider
+
+        val documentReference = FirebaseFirestore.getInstance()
+            .collection(usersCollection)
+            .document(uid)
+
+        RxFirestore.setDocument(documentReference, newUserInfo)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                {
+                    authData.name = displayName
+                    authData.availableSkins = emptyList()
+                    authData.completedChallenges = emptyList()
+
+                    catController.setSkin(authData.currentSkin)
+
+                    router.newRootFlow(Screens.MainFlow)
+                },
+                {
+                    Timber.e(it)
+                    reportError(it)
+                    viewState.showMessage(it.message)
+                }
+            )
+            .connect()
     }
 
     fun onBackPressed() = router.finishFlow()

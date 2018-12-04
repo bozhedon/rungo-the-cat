@@ -5,6 +5,8 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.arellomobile.mvp.MvpAppCompatFragment
+import com.crashlytics.android.Crashlytics
+import com.yandex.metrica.YandexMetrica
 
 abstract class BaseFragment : MvpAppCompatFragment() {
     abstract val layoutRes: Int
@@ -13,8 +15,11 @@ abstract class BaseFragment : MvpAppCompatFragment() {
 
     private val viewHandler = Handler()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
-        inflater.inflate(layoutRes, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = inflater.inflate(layoutRes, container, false)!!
 
     override fun onResume() {
         super.onResume()
@@ -52,6 +57,11 @@ abstract class BaseFragment : MvpAppCompatFragment() {
     protected fun isFirstLaunch(savedInstanceState: Bundle?): Boolean {
         val savedAppCode = savedInstanceState?.getString(STATE_LAUNCH_FLAG)
         return savedAppCode != App.appCode
+    }
+
+    protected fun reportError(throwable: Throwable) {
+        Crashlytics.logException(throwable)
+        YandexMetrica.reportUnhandledException(throwable)
     }
 
     open fun onBackPressed() {}
