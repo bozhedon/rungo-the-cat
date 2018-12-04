@@ -43,4 +43,5 @@
     <string name="avg_speed">%.1f км/ч</string>
     <string name="tab_run">бег</string>
     <string name="tab_map">карта</string>
+    <string name="meter">м</string>
 </resources>

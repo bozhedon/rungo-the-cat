@@ -78,7 +78,7 @@ class RunPresenter @Inject constructor(
             .subscribe(
                 {
                     currentDistance = it.distance.toFloat()/1000
-                    
+
                     if (initTime != 0) {
                         viewState.showSpeed(it.speed.toFloat()*3.6f, it.distance.toFloat()*3.6f / initTime)
                     }
