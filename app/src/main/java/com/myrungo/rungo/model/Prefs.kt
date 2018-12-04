@@ -92,7 +92,7 @@ class Prefs @Inject constructor(
             )
     }
 
-    override var distance: Double
+    override var totalDistance: Double
         get() {
             val distanceValue =
                 getSharedPreferences(AUTH_DATA).getString(KEY_DISTANCE, "0")?.toDoubleOrNull()
