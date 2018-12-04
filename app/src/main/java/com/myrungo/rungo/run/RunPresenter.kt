@@ -52,7 +52,6 @@ class RunPresenter @Inject constructor(
     private var distanceInMeters = 0.0
 
     private var startTime: Long = 0
-    private var endTime: Long = 0
 
     private val challengeTime =
         if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time / 100}:${challenge.time % 100}"
@@ -153,7 +152,6 @@ class RunPresenter @Inject constructor(
             startTimer()
             viewState.run(true)
         } else {
-            endTime = System.currentTimeMillis()
             viewState.run(false)
             timerDisposable?.dispose()
         }
@@ -203,10 +201,9 @@ class RunPresenter @Inject constructor(
 
             navigationController.open(1)
             return
-        } else if (!isItChallenge) {
-            saveTrainingToDB()
-            return
         }
+
+        saveTrainingToDB()
 
         Completable.fromCallable { database.locationDao.clear() }
             .subscribeOn(schedulers.io())
@@ -265,7 +262,7 @@ class RunPresenter @Inject constructor(
         val trainingInfo = Training(
             distance = km,
             startTime = startTime,
-            endTime = endTime,
+            endTime = System.currentTimeMillis(),
             averageSpeed = avgSpeed
         )
 
@@ -309,7 +306,7 @@ class RunPresenter @Inject constructor(
             minutes = minutes,
             reward = award.name,
             startTime = startTime,
-            endTime = endTime,
+            endTime = System.currentTimeMillis(),
             averageSpeed = avgSpeed
         )
 
