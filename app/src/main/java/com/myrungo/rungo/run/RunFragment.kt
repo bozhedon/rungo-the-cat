@@ -109,6 +109,7 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
 
     override fun dialogPositiveClicked(tag: String) {
         presenter.exit()
+        activity?.stopService(Intent(activity, LocationService::class.java))
     }
 
     override fun onBackPressed() {
