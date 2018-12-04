@@ -14,6 +14,7 @@ import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.challenge.ChallengeItem
 import com.myrungo.rungo.constants.challengesCollection
 import com.myrungo.rungo.constants.trainingsCollection
+import com.myrungo.rungo.constants.userTotalDistanceKey
 import com.myrungo.rungo.constants.usersCollection
 import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.SchedulersProvider
@@ -220,22 +221,34 @@ class RunPresenter @Inject constructor(
     }
 
     private fun saveTotalDistanceToDB() {
-
+        RxFirestore.updateDocument(currentUserDocument, userTotalDistanceKey, authData.distance)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { },
+                {
+                    viewState.showMessage(it.message)
+                    report(it)
+                    router.exit()
+                }
+            )
+            .connect()
     }
 
     private val currentUser
         get() = FirebaseAuth.getInstance().currentUser!!
 
-    private val currentUserChallengesCollection
+    private val currentUserDocument
         get() = FirebaseFirestore.getInstance()
             .collection(usersCollection)
             .document(currentUser.uid)
+
+    private val currentUserChallengesCollection
+        get() = currentUserDocument
             .collection(challengesCollection)
 
     private val currentUserTrainingsCollection
-        get() = FirebaseFirestore.getInstance()
-            .collection(usersCollection)
-            .document(currentUser.uid)
+        get() = currentUserDocument
             .collection(trainingsCollection)
 
     private fun saveTrainingToDB() {

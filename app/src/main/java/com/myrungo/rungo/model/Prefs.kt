@@ -67,10 +67,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetUserDocumentForNameChange(it, name) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -91,10 +88,7 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -122,10 +116,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetUserDocumentForDistanceChange(it, distanceValue) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -149,10 +140,7 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -180,10 +168,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetUserDocumentForWeekDistanceChange(it, spWeekDistance) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -207,10 +192,7 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -240,10 +222,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetUserDocumentForMonthDistanceChange(it, spMonthDistance) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -267,10 +246,7 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -298,10 +274,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetUserDocumentForYearDistanceChange(it, spYearDistance) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -325,10 +298,7 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -358,10 +328,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetChallengesCollectionForAvailableSkins(it, availableSkins) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -408,10 +375,7 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -440,10 +404,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetUserDocumentForCurrentSkinChange(it, spCurrentSkin) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -467,10 +428,7 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -504,10 +462,7 @@ class Prefs @Inject constructor(
             .subscribeOn(schedulers.ui())
             .subscribe(
                 { onGetChallengesCollectionForCompletedChallenges(it, spCompletedChallenges) },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
@@ -561,14 +516,12 @@ class Prefs @Inject constructor(
             .observeOn(schedulers.ui())
             .subscribe(
                 { },
-                {
-                    Timber.e(it)
-                    reportError(it)
-                }
+                { report(it) }
             )
     }
 
-    private fun reportError(throwable: Throwable) {
+    private fun report(throwable: Throwable) {
+        Timber.e(throwable)
         Crashlytics.logException(throwable)
         YandexMetrica.reportUnhandledException(throwable)
     }

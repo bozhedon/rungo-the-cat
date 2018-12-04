@@ -12,9 +12,8 @@ import com.myrungo.rungo.AppActivity
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.Screens
 import com.myrungo.rungo.cat.CatController
-import com.myrungo.rungo.constants.userEmailKey
-import com.myrungo.rungo.constants.userPhoneNumberKey
 import com.myrungo.rungo.constants.usersCollection
+import com.myrungo.rungo.model.DBUser
 import com.myrungo.rungo.model.FlowRouter
 import com.myrungo.rungo.model.SchedulersProvider
 import durdinapps.rxfirebase2.RxFirestore
@@ -81,8 +80,6 @@ class AuthPresenter @Inject constructor(
 
         val creationTimestamp = metadata?.creationTimestamp ?: System.currentTimeMillis()
 
-        val newUserInfo = mutableMapOf<String, Any>()
-
         val email = user.email ?: ""
         val displayName = user.displayName ?: ""
         val phoneNumber = user.phoneNumber ?: ""
@@ -96,14 +93,20 @@ class AuthPresenter @Inject constructor(
 
         val photoUrl = photoUri.toString()
 
-        newUserInfo["reg_date"] = creationTimestamp
-        newUserInfo["name"] = displayName
-        newUserInfo[userEmailKey] = email
-        newUserInfo[userPhoneNumberKey] = phoneNumber
-        newUserInfo["photoUri"] = photoUrl
-        newUserInfo["uid"] = uid
-        newUserInfo["isAnonymous"] = isAnonymous
-        newUserInfo["provider"] = provider
+        val newUserInfo = DBUser(
+            email = email,
+            isAnonymous = isAnonymous,
+            name = displayName,
+            phoneNumber = phoneNumber,
+            photoUri = photoUrl,
+            provider = provider,
+            reg_date = creationTimestamp,
+            uid = uid,
+            age = 0,
+            costume = authData.currentSkin.name,
+            height = 0,
+            totalDistance = authData.distance
+        )
 
         val documentReference = FirebaseFirestore.getInstance()
             .collection(usersCollection)
