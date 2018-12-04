@@ -1,4 +1,4 @@
-package com.myrungo.rungo.customize_done
+package com.myrungo.rungo.customize.done
 
 import com.arellomobile.mvp.MvpView
 import com.myrungo.rungo.BasePresenter

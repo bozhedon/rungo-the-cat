@@ -1,11 +1,6 @@
 package com.myrungo.rungo.run
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.location.Location
 import com.arellomobile.mvp.InjectViewState
-import com.google.android.gms.location.LocationRequest
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
@@ -14,6 +9,8 @@ import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.challenge.ChallengeItem
 import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.SchedulersProvider
+import com.myrungo.rungo.model.database.AppDatabase
+import com.myrungo.rungo.model.location.TraininigListener
 import com.myrungo.rungo.toTime
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -27,21 +24,20 @@ import javax.inject.Inject
 class RunPresenter @Inject constructor(
     private val challenge: ChallengeItem,
     private val router: Router,
-    private val locationProvider: ReactiveLocationProvider,
     private val catController: CatController,
     private val challengeController: ChallengeController,
     private val navigationController: MainNavigationController,
     private val schedulers: SchedulersProvider,
-    private val authData: AuthHolder
+    private val authData: AuthHolder,
+    private val database: AppDatabase,
+    private val traininigListener: TraininigListener
 ) : BasePresenter<RunView>() {
 
     private var currentTab = 0
-    private var isRun = false
     private var timerDisposable: Disposable? = null
     private var initTime = 0
     private var isComplete = false
     private var timeOut = false
-    private var currentLocation: Location? = null
     private var currentDistance = 0f
     private var lastDistance = 0f
     private var lastTime = 0
@@ -56,6 +52,16 @@ class RunPresenter @Inject constructor(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+
+        database.locationDao.listenLastLocation()
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { location ->
+                    //TODO отображать метки
+                },
+                { Timber.e(it) }
+            )
+            .connect()
 
         catController.skinState
             .subscribe(
@@ -109,11 +115,13 @@ class RunPresenter @Inject constructor(
     }
 
     fun onStartClicked() {
-        isRun = !isRun
-        viewState.run(isRun)
-        if (isRun) {
+        traininigListener.isRun = !traininigListener.isRun
+
+        if (traininigListener.isRun) {
             startTimer()
+            viewState.run(true)
         } else {
+            viewState.run(false)
             timerDisposable?.dispose()
         }
     }
@@ -167,15 +175,6 @@ class RunPresenter @Inject constructor(
     }
 
     companion object {
-        private const val LOCATION_UPDATE_INTERVAL = 100L
         private const val DIALOG_TAG = "rp_dialog_tag"
-    }
-
-    private inner class MyReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val location = intent.getParcelableExtra<Location>(LocationService.EXTRA_LOCATION)
-            val distance = intent.getDoubleExtra(LocationService.EXTRA_DISTANCE, 0.0)
-            viewState.showDistance("%.1f".format(distance), challengeDistance)
-        }
     }
 }

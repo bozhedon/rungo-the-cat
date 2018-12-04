@@ -14,9 +14,10 @@ interface RunView : MvpView {
     fun showTime(curTime: String, challengeTime: String)
     fun showSpeed(curSpeed: Float, avgSpeed: Float)
     fun showDistance(curDistance: String, challengeDistance: String)
-    fun drawRoute (mLocation:Location)
     fun run(isRun: Boolean)
 
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun drawRoute (location: Location)
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun showDialog(title: String, msg: String, tag: String)
 }

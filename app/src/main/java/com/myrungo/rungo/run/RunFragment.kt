@@ -1,5 +1,6 @@
 package com.myrungo.rungo.run
 
+import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -7,12 +8,12 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.cat.CatView
+import com.myrungo.rungo.model.location.LocationService
 import com.myrungo.rungo.run.alert.AlertFragment
 import com.myrungo.rungo.visible
 import kotlinx.android.synthetic.main.fragment_run.*
@@ -40,6 +41,8 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
 
         tab_run.setOnClickListener { presenter.onTabClicked(0) }
         tab_map.setOnClickListener { presenter.onTabClicked(1) }
+
+        activity?.startService(Intent(activity, LocationService::class.java))
     }
 
     override fun showTime(curTime: String, challengeTime: String) {
@@ -113,20 +116,10 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
     }
 
     override fun drawRoute(location: Location) {
-        //val polylineOptions = PolylineOptions().width(10f).color(Color.YELLOW)
-        //polylineOptions.add(lastLatLng, LatLng(location.getLatitude(), location.getLongitude()))
-        //val polyline = map.addPolyline(polylineOptions)
-        //map.addPolyline(polylineOptions)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        map_view.onCreate(savedInstanceState)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        map_view.onStart()
+//        val polylineOptions = PolylineOptions().width(10f).color(Color.YELLOW)
+//        polylineOptions.add(lastLatLng, LatLng(location.getLatitude(), location.getLongitude()))
+//        val polyline = map.addPolyline(polylineOptions)
+//        map?.addPolyline(polylineOptions)
     }
 
     override fun onResume() {
@@ -137,16 +130,6 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
     override fun onPause() {
         super.onPause()
         map_view.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        map_view.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        map_view.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

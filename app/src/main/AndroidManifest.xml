@@ -53,5 +53,7 @@
                 <data android:host="myrungo.com"/>
             </intent-filter>
         </activity>
+
+        <service android:name="com.myrungo.rungo.model.location.LocationService" android:exported="false"/>
     </application>
 </manifest>

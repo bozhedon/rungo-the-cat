@@ -8,6 +8,9 @@ import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.model.*
+import com.myrungo.rungo.model.database.AppDatabase
+import com.myrungo.rungo.model.database.DatabaseProvider
+import com.myrungo.rungo.model.location.TraininigListener
 import com.yandex.metrica.YandexMetrica
 import com.yandex.metrica.YandexMetricaConfig
 import io.fabric.sdk.android.Fabric
@@ -106,6 +109,9 @@ class App : Application() {
                         val cicerone = Cicerone.create()
                         bind(Router::class.java).toInstance(cicerone.router)
                         bind(NavigatorHolder::class.java).toInstance(cicerone.navigatorHolder)
+
+                        bind(AppDatabase::class.java).toProvider(DatabaseProvider::class.java).providesSingletonInScope()
+                        bind(TraininigListener::class.java).toInstance(TraininigListener())
                     }
                 }
             )
