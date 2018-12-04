@@ -55,6 +55,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.myrungo.rungo.model.location.LocationService" android:exported="false"/>
+        <service android:name="com.myrungo.rungo.model.location.LocationService"/>
     </application>
 </manifest>

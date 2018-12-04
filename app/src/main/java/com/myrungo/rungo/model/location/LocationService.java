@@ -1,16 +1,25 @@
 package com.myrungo.rungo.model.location;
 
+import android.Manifest;
 import android.app.*;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.*;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import com.google.android.gms.location.*;
 import com.myrungo.rungo.AppActivity;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.Scopes;
+import com.myrungo.rungo.model.SchedulersProvider;
 import com.myrungo.rungo.model.database.AppDatabase;
 import com.myrungo.rungo.model.database.entity.LocationDb;
+import io.reactivex.Completable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import timber.log.Timber;
 import toothpick.Toothpick;
 
 import javax.inject.Inject;
@@ -27,14 +36,13 @@ public class LocationService extends Service {
     private Location mLocation;
     private LocationRequest mLocationRequest;
     private NotificationManager mNotificationManager;
-
     private Double mDistance = 0.0;
 
-    @Inject
-    AppDatabase database;
+    @Inject AppDatabase database;
+    @Inject TraininigListener trainingListener;
+    @Inject SchedulersProvider schedulers;
 
-    @Inject
-    TraininigListener trainingListener;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public LocationService() {
     }
@@ -54,12 +62,11 @@ public class LocationService extends Service {
             mNotificationManager.createNotificationChannel(mChannel);
         }
 
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest = new LocationRequest()
+                .setInterval(UPDATE_INTERVAL_IN_MILLISECONDS)
+                .setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -67,6 +74,13 @@ public class LocationService extends Service {
                 onNewLocation(locationResult.getLastLocation());
             }
         };
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+        }
 
         startForeground(NOTIFICATION_ID, getNotification());
     }
@@ -79,16 +93,38 @@ public class LocationService extends Service {
 
     @Override
     public void onDestroy() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        if (mFusedLocationClient != null) {
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        }
         super.onDestroy();
     }
 
-    private void onNewLocation(Location location) {
+    private void onNewLocation(final Location location) {
+        if (mLocation == null) {
+            mLocation = location;
+            return;
+        }
+
         if (!trainingListener.isRun()) {
             return;
         }
 
-        database.getLocationDao().insert(new LocationDb(location.getLatitude(), location.getLongitude(), 0));
+        compositeDisposable.add(
+                Completable.fromAction(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        database.getLocationDao().insert(new LocationDb(location.getLatitude(), location.getLongitude(), 0));
+                    }
+                })
+                        .subscribeOn(schedulers.io())
+                        .doOnError(new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                Timber.e(throwable);
+                            }
+                        })
+                        .subscribe()
+        );
 
         //proverka na tochnost
         if (location.distanceTo(mLocation) > location.getAccuracy() + mLocation.getAccuracy()) {
