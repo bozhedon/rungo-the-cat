@@ -4,6 +4,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.view.View
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -94,6 +96,21 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
         AlertFragment.create(title, msg, tag).show(childFragmentManager, tag)
     }
 
+    override fun showMessage(message: String?) {
+        if (message != null) {
+            val activity = activity
+
+            if (activity != null) {
+                Snackbar.make(
+                    activity.findViewById<View>(android.R.id.content),
+                    message,
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+        }
+
+    }
+
     override fun run(isRun: Boolean) {
         screen_layout.setBackgroundResource(
             if (isRun) R.color.run_active_background
@@ -104,7 +121,7 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
             else R.drawable.ic_run_play
         )
         stop_button.visible(!isRun)
-        
+
         cat_view.post {
             if (isRun) cat_view.run()
             else cat_view.stop()

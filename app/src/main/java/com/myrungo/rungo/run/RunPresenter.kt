@@ -1,18 +1,23 @@
 package com.myrungo.rungo.run
 
 import com.arellomobile.mvp.InjectViewState
+import com.google.android.gms.location.LocationRequest
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.challenge.ChallengeItem
+import com.myrungo.rungo.constants.*
 import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.SchedulersProvider
 import com.myrungo.rungo.model.database.AppDatabase
 import com.myrungo.rungo.model.location.TraininigListener
 import com.myrungo.rungo.toTime
 import io.reactivex.Completable
+import durdinapps.rxfirebase2.RxFirestore
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import ru.terrakok.cicerone.Router
@@ -41,8 +46,8 @@ class RunPresenter @Inject constructor(
     private var currentDistance = 0f
 
     private val challengeTime =
-            if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time/100}:${challenge.time%100}"
-            else ""
+        if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time / 100}:${challenge.time % 100}"
+        else ""
 
     private val challengeDistance =
         if (challenge.id != ChallengeController.EMPTY.id) challenge.distance.toString()
@@ -170,13 +175,14 @@ class RunPresenter @Inject constructor(
         if (isComplete && challenge.id != ChallengeController.EMPTY.id) {
             challengeController.finishChallenge(challenge)
 
-            val availableSkins = mutableListOf<CatView.Skins>()
-            availableSkins.addAll(authData.availableSkins)
-            ChallengeController.getAward(challenge)?.let { availableSkins.add(it) }
+            ChallengeController.getAward(challenge)?.let { award ->
+                saveToSP(award)
 
-            authData.availableSkins = availableSkins
+                saveToDB(award)
+            }
 
             navigationController.open(1)
+            return
         }
 
         Completable.fromCallable { database.locationDao.clear() }
@@ -185,6 +191,52 @@ class RunPresenter @Inject constructor(
             .connect()
 
         router.exit()
+    }
+
+    private fun saveToSP(award: CatView.Skins) {
+        val availableSkins = mutableListOf<CatView.Skins>()
+        availableSkins.addAll(authData.availableSkins)
+        availableSkins.add(award)
+
+        authData.availableSkins = availableSkins
+    }
+
+    private fun saveToDB(award: CatView.Skins) {
+        FirebaseAuth.getInstance().currentUser?.let { currentUser ->
+            val challengeInfo = mutableMapOf<String, Any>()
+
+            val hour = initTime / 3600
+            val minutes = initTime / 60
+
+            challengeInfo[challengeDistanceKey] = currentDistance
+            challengeInfo[challengeHourKey] = hour
+            challengeInfo[challengeIdKey] = challenge.id
+            challengeInfo[challengeImgURLKey] = ""
+            challengeInfo[challengeIsCompleteKey] = isComplete
+            challengeInfo[challengeMinutesKey] = minutes
+            challengeInfo[challengeRewardKey] = award.name
+
+            val collectionReference = FirebaseFirestore.getInstance()
+                .collection(usersCollection)
+                .document(currentUser.uid)
+                .collection(challengesCollection)
+
+            RxFirestore.addDocument(collectionReference, challengeInfo)
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
+                .subscribe(
+                    {
+                        router.exit()
+                    },
+                    {
+                        Timber.e(it)
+                        reportError(it)
+                        viewState.showMessage(it.message)
+                        router.exit()
+                    }
+                )
+                .connect()
+        }
     }
 
     override fun onDestroy() {
