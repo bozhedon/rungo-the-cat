@@ -7,4 +7,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 @StateStrategyType(OneExecutionStateStrategy::class)
 interface ChoiceView : MvpView {
     fun dismiss()
+    fun showNeedLocationPermissionRationaleDialog()
+    fun showGoSettingsDialog()
+    fun startSettingsActivityForResult()
 }

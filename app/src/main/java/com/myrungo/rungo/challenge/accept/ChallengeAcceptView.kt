@@ -7,4 +7,8 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 @StateStrategyType(OneExecutionStateStrategy::class)
 interface ChallengeAcceptView : MvpView {
     fun dismiss()
+    fun onPermissionGranted()
+    fun showNeedLocationPermissionRationaleDialog()
+    fun showGoSettingsDialog()
+    fun startSettingsActivityForResult()
 }

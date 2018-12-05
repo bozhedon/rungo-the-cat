@@ -45,4 +45,11 @@
     <string name="tab_map">карта</string>
     <string name="meter">м</string>
     <string name="notification_title">Пройдено:</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="impossible_to_continue">Продолжение работы невозможно</string>
+    <string name="go_to_applications_settings_and_provide_permissions_to_location">Для дальнейшей работы необходимо перейти в настройки приложения и включить разрешение доступа к местоположению</string>
+    <string name="go_to">Перейти</string>
+    <string name="application_needs_permissions_to_location">Для дальнейшей работы приложению необходимы права доступа к местоположению</string>
+    <string name="provide">Предоставить</string>
 </resources>

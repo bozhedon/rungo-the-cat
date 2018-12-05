@@ -2,7 +2,6 @@ package com.myrungo.rungo.run
 
 import android.content.Intent
 import android.graphics.Color
-import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.view.View
@@ -35,7 +34,7 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
     @ProvidePresenter
     fun providePresenter() = Toothpick
         .openScope(Scopes.PLAY)
-        .getInstance(RunPresenter::class.java)
+        .getInstance(RunPresenter::class.java)!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -140,12 +139,26 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
     override fun drawRoute(locationDb: LocationDb) {
         if (lastLatLng == null) {
             lastLatLng = LatLng(locationDb.latitude, locationDb.longitude)
-            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationDb.latitude, locationDb.longitude), 17f))
+            map?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        locationDb.latitude,
+                        locationDb.longitude
+                    ), 17f
+                )
+            )
         } else {
             val polylineOptions = PolylineOptions().width(10f).color(Color.YELLOW)
             polylineOptions.add(lastLatLng, LatLng(locationDb.latitude, locationDb.longitude))
             map?.addPolyline(polylineOptions)
-            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationDb.latitude, locationDb.longitude), 17f))
+            map?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        locationDb.latitude,
+                        locationDb.longitude
+                    ), 17f
+                )
+            )
             lastLatLng = LatLng(locationDb.latitude, locationDb.longitude)
         }
     }
