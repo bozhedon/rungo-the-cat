@@ -11,8 +11,8 @@ android {
         applicationId "com.myrungo.rungo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 6
-        versionName "1.0-rc02"
+        versionCode 8
+        versionName "1.0-rc04"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
@@ -26,7 +26,7 @@ android {
         config {
             keyAlias 'rungo'
             keyPassword 'rungothecat'
-            storeFile file('C:/Users/avpopo85/AndroidStudioProjects/rungo-the-cat/keystore.jks')
+            storeFile file("$projectDir/../keystore.jks")
             storePassword 'rungothecat'
         }
     }
