@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "16007015268-cbd948coak6uubqcsud180m77i0jfoqv.apps.googleusercontent.com",
+          "client_id": "16007015268-ie1vht0itfaihn7fj73sugd51kd55k14.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.myrungo.rungo",
-            "certificate_hash": "869e7a974889d1e36d7213e4cf9bf06e01ae487e"
+            "certificate_hash": "4f172be822964550931bdd4cf0e246f85a317eab"
           }
         },
         {
@@ -36,6 +36,30 @@
           "android_info": {
             "package_name": "com.myrungo.rungo",
             "certificate_hash": "931d72106a461d593531b8e222a2cacf82a06a8a"
+          }
+        },
+        {
+          "client_id": "16007015268-hin4fjlo4r6marms9t9uunfckkmg7dn8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "869e7a974889d1e36d7213e4cf9bf06e01ae487e"
+          }
+        },
+        {
+          "client_id": "16007015268-6ro2id9jqcgs1n27puj3krstnf848ttp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "3ace865fb0bb4ad1804cfb5ad0172a891f9e2946"
+          }
+        },
+        {
+          "client_id": "16007015268-7r414kmiogltfuesjuhg8t45pevjf67a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "316e4b0abec18b6a2d20d1aa5070b19d7d23bd6e"
           }
         },
         {
