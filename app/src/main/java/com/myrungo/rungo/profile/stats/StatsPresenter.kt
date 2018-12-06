@@ -1,17 +1,15 @@
 package com.myrungo.rungo.profile.stats
 
+import android.content.Context
 import com.arellomobile.mvp.InjectViewState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.myrungo.rungo.BasePresenter
+import com.myrungo.rungo.R
 import com.myrungo.rungo.Screens
-import com.myrungo.rungo.auth.AuthHolder
-import com.myrungo.rungo.cat.CatController
-import com.myrungo.rungo.constants.challengesCollection
-import com.myrungo.rungo.constants.trainingsCollection
-import com.myrungo.rungo.constants.usersCollection
-import com.myrungo.rungo.model.MainNavigationController
-import com.myrungo.rungo.model.ResourceManager
+import com.myrungo.rungo.utils.constants.challengesCollection
+import com.myrungo.rungo.utils.constants.trainingsCollection
+import com.myrungo.rungo.utils.constants.usersCollection
 import com.myrungo.rungo.model.SchedulersProvider
 import com.myrungo.rungo.profile.stats.models.*
 import com.myrungo.rungo.profile.stats.models.TimeInterval.*
@@ -25,11 +23,8 @@ import javax.inject.Inject
 class StatsPresenter @Inject constructor(
     private val router: Router,
     private val schedulersProvider: SchedulersProvider,
-    private val resourceManager: ResourceManager,
-    private val navigation: MainNavigationController,
-    private val catController: CatController,
-    private val authData: AuthHolder,
-    private val networkManager: NetworkManager
+    private val networkManager: NetworkManager,
+    private val context: Context
 ) : BasePresenter<StatsView>() {
 
     fun getInfoFor(tabId: Int?) {
@@ -58,94 +53,134 @@ class StatsPresenter @Inject constructor(
 
     private fun calculateInfoFor(timeField: TimeInterval): Single<UserTimeIntervalsInfo> =
         Single.create { emitter ->
-            val calendarTimeInterval = when (timeField) {
-                TimeInterval.WEEK -> Calendar.WEEK_OF_YEAR
-                TimeInterval.MONTH -> Calendar.MONTH
-                TimeInterval.YEAR -> Calendar.YEAR
-            }
-
-            val currentCalendar = Calendar.getInstance()
-            val currentTimeInterval = currentCalendar.get(calendarTimeInterval)
-            currentCalendar.add(calendarTimeInterval, -1)
-            val previousTimeInterval = currentCalendar.get(calendarTimeInterval)
-
-            var currentTimeIntervalTotalDistance = 0.0
-            var previousTimeIntervalTotalDistance = 0.0
-
-            var currentTimeIntervalTotalNumberTrainings: Long = 0
-            var previousTimeIntervalTotalNumberTrainings: Long = 0
-
-            var currentTimeIntervalAverageSpeed = 0.0
-            var previousTimeIntervalAverageSpeed = 0.0
-
-            for (training in currentUserTrainings) {
-                val trainingWasOnCurrentTimeInterval = wasTrainingOnThis(
-                    currentTimeInterval,
-                    training.startTime,
-                    training.endTime,
-                    calendarTimeInterval
-                )
-
-                val trainingWasOnPreviousTimeInterval = wasTrainingOnThis(
-                    previousTimeInterval,
-                    training.startTime,
-                    training.endTime,
-                    calendarTimeInterval
-                )
-
-                if (trainingWasOnCurrentTimeInterval) {
-                    currentTimeIntervalTotalNumberTrainings++
-                    currentTimeIntervalTotalDistance += training.distance
-                    currentTimeIntervalAverageSpeed += training.averageSpeed
-                } else if (trainingWasOnPreviousTimeInterval) {
-                    previousTimeIntervalTotalNumberTrainings++
-                    previousTimeIntervalTotalDistance += training.distance
-                    previousTimeIntervalAverageSpeed += training.averageSpeed
+            try {
+                val calendarTimeInterval = when (timeField) {
+                    TimeInterval.WEEK -> Calendar.WEEK_OF_YEAR
+                    TimeInterval.MONTH -> Calendar.MONTH
+                    TimeInterval.YEAR -> Calendar.YEAR
                 }
-            }
 
-            for (challenge in currentUserChallenges) {
-                val trainingWasOnCurrentTimeInterval = wasTrainingOnThis(
-                    currentTimeInterval,
-                    challenge.startTime,
-                    challenge.endTime,
-                    calendarTimeInterval
-                )
+                val currentCalendar = Calendar.getInstance()
+                val currentTimeInterval = currentCalendar.get(calendarTimeInterval)
+                currentCalendar.add(calendarTimeInterval, -1)
+                val previousTimeInterval = currentCalendar.get(calendarTimeInterval)
 
-                val trainingWasOnPreviousTimeInterval = wasTrainingOnThis(
-                    previousTimeInterval,
-                    challenge.startTime,
-                    challenge.endTime,
-                    calendarTimeInterval
-                )
+                var currentTimeIntervalTotalDistanceInKm = 0.0
+                var previousTimeIntervalTotalDistanceInKm = 0.0
 
-                if (trainingWasOnCurrentTimeInterval) {
-                    currentTimeIntervalTotalDistance += challenge.distance
-                    currentTimeIntervalAverageSpeed += challenge.averageSpeed
-                } else if (trainingWasOnPreviousTimeInterval) {
-                    previousTimeIntervalTotalDistance += challenge.distance
-                    previousTimeIntervalAverageSpeed += challenge.averageSpeed
+                var currentTimeIntervalTotalNumberTrainings: Long = 0
+                var previousTimeIntervalTotalNumberTrainings: Long = 0
+
+                var currentTimeIntervalAverageSpeedInKmH = 0.0
+                var previousTimeIntervalAverageSpeedInKmH = 0.0
+
+                for (training in currentUserTrainings) {
+                    val trainingWasOnCurrentTimeInterval = wasTrainingOnThis(
+                        currentTimeInterval,
+                        training.startTime,
+                        training.endTime,
+                        calendarTimeInterval
+                    )
+
+                    val trainingWasOnPreviousTimeInterval = wasTrainingOnThis(
+                        previousTimeInterval,
+                        training.startTime,
+                        training.endTime,
+                        calendarTimeInterval
+                    )
+
+                    if (trainingWasOnCurrentTimeInterval) {
+                        currentTimeIntervalTotalNumberTrainings++
+                        currentTimeIntervalTotalDistanceInKm += training.distanceInKm
+                        currentTimeIntervalAverageSpeedInKmH += training.averageSpeedInKmH
+                    } else if (trainingWasOnPreviousTimeInterval) {
+                        previousTimeIntervalTotalNumberTrainings++
+                        previousTimeIntervalTotalDistanceInKm += training.distanceInKm
+                        previousTimeIntervalAverageSpeedInKmH += training.averageSpeedInKmH
+                    }
                 }
-            }
 
-            val currentTimeIntervalInfo = UserTimeIntervalInfo(
-                currentTimeIntervalTotalDistance,
-                currentTimeIntervalTotalNumberTrainings,
-                currentTimeIntervalAverageSpeed
-            )
+                var currentTimeIntervalTotalNumberChallenges: Long = 0
+                var previousTimeIntervalTotalNumberChallenges: Long = 0
 
-            val previousTimeIntervalInfo = UserTimeIntervalInfo(
-                previousTimeIntervalTotalDistance,
-                previousTimeIntervalTotalNumberTrainings,
-                previousTimeIntervalAverageSpeed
-            )
+                for (challenge in currentUserChallenges) {
+                    val trainingWasOnCurrentTimeInterval = wasTrainingOnThis(
+                        currentTimeInterval,
+                        challenge.startTime,
+                        challenge.endTime,
+                        calendarTimeInterval
+                    )
 
-            emitter.onSuccess(
-                UserTimeIntervalsInfo(
-                    currentTimeIntervalInfo,
-                    previousTimeIntervalInfo
+                    val trainingWasOnPreviousTimeInterval = wasTrainingOnThis(
+                        previousTimeInterval,
+                        challenge.startTime,
+                        challenge.endTime,
+                        calendarTimeInterval
+                    )
+
+                    if (trainingWasOnCurrentTimeInterval) {
+                        currentTimeIntervalTotalNumberChallenges++
+                        currentTimeIntervalTotalDistanceInKm += challenge.distanceInKm
+                        currentTimeIntervalAverageSpeedInKmH += challenge.averageSpeedInKmH
+                    } else if (trainingWasOnPreviousTimeInterval) {
+                        previousTimeIntervalTotalNumberChallenges++
+                        previousTimeIntervalTotalDistanceInKm += challenge.distanceInKm
+                        previousTimeIntervalAverageSpeedInKmH += challenge.averageSpeedInKmH
+                    }
+                }
+
+                val currentTimeIntervalInfo =
+                    run {
+                        val trainingsAndChallengesNumberInCurrentTimeInterval =
+                            currentTimeIntervalTotalNumberTrainings +
+                                    currentTimeIntervalTotalNumberChallenges
+
+                        val totalAverageSpeedInCurrentTimeInterval =
+                            if (trainingsAndChallengesNumberInCurrentTimeInterval == 0L) {
+                                0.0
+                            } else {
+                                currentTimeIntervalAverageSpeedInKmH /
+                                        trainingsAndChallengesNumberInCurrentTimeInterval
+                            }
+
+                        UserTimeIntervalInfo(
+                            currentTimeIntervalTotalDistanceInKm,
+                            currentTimeIntervalTotalNumberTrainings,
+                            totalAverageSpeedInCurrentTimeInterval
+                        )
+                    }
+
+                val previousTimeIntervalInfo =
+                    run {
+                        val trainingsAndChallengesNumberInPreviousTimeInterval =
+                            previousTimeIntervalTotalNumberTrainings +
+                                    previousTimeIntervalTotalNumberChallenges
+
+                        val totalAverageSpeedInPreviousTimeInterval =
+                            if (trainingsAndChallengesNumberInPreviousTimeInterval == 0L) {
+                                0.0
+                            } else {
+                                previousTimeIntervalAverageSpeedInKmH /
+                                        trainingsAndChallengesNumberInPreviousTimeInterval
+                            }
+
+                        UserTimeIntervalInfo(
+                            previousTimeIntervalTotalDistanceInKm,
+                            previousTimeIntervalTotalNumberTrainings,
+                            totalAverageSpeedInPreviousTimeInterval
+                        )
+                    }
+
+                emitter.onSuccess(
+                    UserTimeIntervalsInfo(
+                        currentTimeIntervalInfo,
+                        previousTimeIntervalInfo
+                    )
                 )
-            )
+            } catch (e: Exception) {
+                report(e)
+                emitter.onError(e)
+            }
         }
 
     private fun wasTrainingOnThis(
@@ -171,7 +206,7 @@ class StatsPresenter @Inject constructor(
 
     private val currentUser
         get() = FirebaseAuth.getInstance().currentUser
-            ?: throw RuntimeException("User must sign in app")
+            ?: throw RuntimeException(context.getString(R.string.user_must_sign_in))
 
     private val currentUserDocument
         get() = FirebaseFirestore.getInstance()
@@ -184,10 +219,10 @@ class StatsPresenter @Inject constructor(
     private val currentUserTrainings: List<Training>
         get() {
             if (!networkManager.isConnectedToInternet) {
-                viewState.showMessage("Необходимо интернет соединение")
+                viewState.showMessage(context.getString(R.string.internet_connection_required))
                 router.navigateTo(Screens.MainFlow)
 
-                throw RuntimeException("Необходимо интернет соединение")
+                throw RuntimeException(context.getString(R.string.internet_connection_required))
             }
 
             val task = currentUserTrainingsCollection.get()
@@ -203,7 +238,8 @@ class StatsPresenter @Inject constructor(
             for (document in result.documents) {
                 if (document != null) {
                     try {
-                        document.toObject(Training::class.java)?.let { userTrainings += it }
+                        val training = document.toObject(Training::class.java)
+                        training?.let { userTrainings += it }
                     } catch (exception: Exception) {
                         report(exception)
                         continue
@@ -220,10 +256,10 @@ class StatsPresenter @Inject constructor(
     private val currentUserChallenges: List<Challenge>
         get() {
             if (!networkManager.isConnectedToInternet) {
-                viewState.showMessage("Необходимо интернет соединение")
+                viewState.showMessage(context.getString(R.string.internet_connection_required))
                 router.navigateTo(Screens.MainFlow)
 
-                throw RuntimeException("Необходимо интернет соединение")
+                throw RuntimeException(context.getString(R.string.internet_connection_required))
             }
 
             val task = currentUserChallengesCollection.get()
@@ -232,14 +268,15 @@ class StatsPresenter @Inject constructor(
 
             task.exception?.let { report(it); throw it }
 
-            val result = task.result ?: return emptyList()
+            val currentUserChallengesCollectionSnapshot = task.result ?: return emptyList()
 
             val userChallenges = mutableListOf<Challenge>()
 
-            for (document in result.documents) {
-                if (document != null) {
+            for (currentUserChallenge in currentUserChallengesCollectionSnapshot.documents) {
+                if (currentUserChallenge != null) {
                     try {
-                        document.toObject(Challenge::class.java)?.let { userChallenges += it }
+                        val challenge = currentUserChallenge.toObject(Challenge::class.java)
+                        challenge?.let { userChallenges += it }
                     } catch (exception: Exception) {
                         report(exception)
                         continue

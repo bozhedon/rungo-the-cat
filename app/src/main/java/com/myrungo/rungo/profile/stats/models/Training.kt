@@ -1,13 +1,23 @@
 package com.myrungo.rungo.profile.stats.models
 
+import com.google.firebase.firestore.PropertyName
+
 data class Training(
-    /**в км/ч*/
-    val averageSpeed: Double = 0.0,
 
-    /**в километрах*/
-    val distance: Double = 0.0,
+    @get:PropertyName("averageSpeed")
+    @PropertyName("averageSpeed")
+    val averageSpeedInKmH: Double = 0.0,
 
+    @get:PropertyName("distance")
+    @PropertyName("distance")
+    val distanceInKm: Double = 0.0,
+
+    @get:PropertyName("startTime")
+    @PropertyName("startTime")
     val startTime: Long = 0,
 
+    @get:PropertyName("endTime")
+    @PropertyName("endTime")
     val endTime: Long = 0
+
 )

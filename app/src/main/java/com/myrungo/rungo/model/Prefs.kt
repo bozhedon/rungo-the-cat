@@ -14,9 +14,8 @@ import com.myrungo.rungo.R
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.challenge.ChallengeItem
-import com.myrungo.rungo.constants.challengesCollection
-import com.myrungo.rungo.constants.usersCollection
 import com.myrungo.rungo.profile.stats.models.Challenge
+import com.myrungo.rungo.utils.constants.*
 import com.yandex.metrica.YandexMetrica
 import durdinapps.rxfirebase2.RxFirestore
 import timber.log.Timber
@@ -43,7 +42,7 @@ class Prefs @Inject constructor(
 
     private val currentUser
         get() = FirebaseAuth.getInstance().currentUser
-            ?: throw RuntimeException("User must sign in app")
+            ?: throw RuntimeException(context.getString(R.string.user_must_sign_in))
 
     private val currentUserDocument
         get() = FirebaseFirestore.getInstance()
@@ -55,7 +54,7 @@ class Prefs @Inject constructor(
 
     override var name: String
         get() {
-            val nameFromSP = authData.getString(KEY_NAME, "User")!!
+            val nameFromSP = authData.getString(KEY_NAME, context.getString(R.string.user))!!
 
             asyncLoadNameFromDBAndSave()
 
@@ -63,7 +62,19 @@ class Prefs @Inject constructor(
         }
         set(value) {
             saveNameToSP(value)
+            saveNameToDB(value)
         }
+
+    @SuppressLint("CheckResult")
+    private fun saveNameToDB(name: String) {
+        RxFirestore.updateDocument(currentUserDocument, userNameKey, name)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { },
+                { report(it) }
+            )
+    }
 
     private fun saveNameToSP(nameValue: String) {
         authData.edit {
@@ -102,12 +113,24 @@ class Prefs @Inject constructor(
         }
         set(value) {
             saveTotalDistanceToSP(value)
+            saveTotalDistanceToDB(value)
         }
 
     private fun saveTotalDistanceToSP(value: Double) {
         authData.edit {
             putString(KEY_DISTANCE, value.toString())
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveTotalDistanceToDB(totalDistance: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userTotalDistanceKey, totalDistance)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { },
+                { report(it) }
+            )
     }
 
     @SuppressLint("CheckResult")
@@ -126,123 +149,6 @@ class Prefs @Inject constructor(
             val currentUserInfoFromDB = currentUser.toObject(DBUser::class.java) ?: return
 
             saveTotalDistanceToSP(currentUserInfoFromDB.totalDistance)
-        } catch (e: Exception) {
-            report(e)
-        }
-    }
-
-    override var weekDistance: Double
-        get() {
-            val weekDistanceFromSP = authData.getString(KEY_DISTANCE_WEEK, "0")!!.toDouble()
-
-            asyncLoadWeekDistanceFromDBAndSave()
-
-            return weekDistanceFromSP
-        }
-        set(value) {
-            saveWeekDistanceToSP(value)
-        }
-
-    private fun saveWeekDistanceToSP(value: Double) {
-        authData.edit {
-            putString(KEY_DISTANCE_WEEK, value.toString())
-        }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun asyncLoadWeekDistanceFromDBAndSave() {
-        RxFirestore.getDocument(currentUserDocument)
-            .subscribeOn(schedulers.io())
-            .subscribeOn(schedulers.ui())
-            .subscribe(
-                { onGetUserDocumentForWeekDistanceChange(it) },
-                { report(it) }
-            )
-    }
-
-    private fun onGetUserDocumentForWeekDistanceChange(currentUser: DocumentSnapshot) {
-        try {
-            val currentUserInfoFromDB = currentUser.toObject(DBUser::class.java) ?: return
-
-            saveWeekDistanceToSP(currentUserInfoFromDB.weekDistance)
-        } catch (e: Exception) {
-            report(e)
-        }
-    }
-
-    override var monthDistance: Double
-        get() {
-            val monthDistanceFromSP = authData.getString(KEY_DISTANCE_MONTH, "0")!!.toDouble()
-
-            asyncLoadMonthDistanceFromDBAndSave()
-
-            return monthDistanceFromSP
-        }
-        set(value) {
-            saveMonthDistanceToSP(value)
-        }
-
-    private fun saveMonthDistanceToSP(value: Double) {
-        authData.edit {
-            putString(KEY_DISTANCE_MONTH, value.toString())
-        }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun asyncLoadMonthDistanceFromDBAndSave() {
-        RxFirestore.getDocument(currentUserDocument)
-            .subscribeOn(schedulers.io())
-            .subscribeOn(schedulers.ui())
-            .subscribe(
-                { onGetUserDocumentForMonthDistanceChange(it) },
-                { report(it) }
-            )
-    }
-
-    private fun onGetUserDocumentForMonthDistanceChange(currentUser: DocumentSnapshot) {
-        try {
-            val currentUserInfoFromDB = currentUser.toObject(DBUser::class.java) ?: return
-
-            saveMonthDistanceToSP(currentUserInfoFromDB.monthDistance)
-        } catch (e: Exception) {
-            report(e)
-        }
-    }
-
-    override var yearDistance: Double
-        get() {
-            val yearDistanceFromSP = authData.getString(KEY_DISTANCE_YEAR, "0")!!.toDouble()
-
-            asyncLoadYearDistanceFromDBAndSave()
-
-            return yearDistanceFromSP
-        }
-        set(value) {
-            saveYearDistanceToSP(value)
-        }
-
-    private fun saveYearDistanceToSP(value: Double) {
-        authData.edit {
-            putString(KEY_DISTANCE_YEAR, value.toString())
-        }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun asyncLoadYearDistanceFromDBAndSave() {
-        RxFirestore.getDocument(currentUserDocument)
-            .subscribeOn(schedulers.io())
-            .subscribeOn(schedulers.ui())
-            .subscribe(
-                { onGetUserDocumentForYearDistanceChange(it) },
-                { report(it) }
-            )
-    }
-
-    private fun onGetUserDocumentForYearDistanceChange(currentUser: DocumentSnapshot) {
-        try {
-            val currentUserInfoFromDB = currentUser.toObject(DBUser::class.java) ?: return
-
-            saveYearDistanceToSP(currentUserInfoFromDB.yearDistance)
         } catch (e: Exception) {
             report(e)
         }
@@ -271,12 +177,18 @@ class Prefs @Inject constructor(
         }
         set(value) {
             saveAvailableSkinsToSP(value)
+            saveAvailableSkinsToDB(value)
         }
 
     private fun saveAvailableSkinsToSP(value: List<CatView.Skins>) {
         authData.edit {
             putString(KEY_SKINS, gson.toJson(value))
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveAvailableSkinsToDB(availableSkins: List<CatView.Skins>) {
+        //todo
     }
 
     @SuppressLint("CheckResult")
@@ -310,34 +222,11 @@ class Prefs @Inject constructor(
         }
     }
 
-    private fun getCurrentUserChallenges(currentUserChallengesSnapshot: QuerySnapshot): List<Challenge> {
-        val currentUserChallenges =
-            currentUserChallengesSnapshot
-                .toObjects(Challenge::class.java)
-                .toSet()
-                .toMutableList()
-
-        //почему-то у некоторых выполненных челленджей из БД isComplete == false, хотя в БД он true
-        //поэтому фиксим
-        for (currentUserChallengeSnapshot in currentUserChallengesSnapshot.documents) {
-            val data = currentUserChallengeSnapshot.data ?: continue
-
-            val isComplete = data["isComplete"]?.toString()?.toBoolean() ?: continue
-
-            val reward = data["reward"]?.toString() ?: continue
-
-            val invalidChallenge =
-                currentUserChallenges.find { it.reward == reward } ?: continue
-
-            val indexOfInvalidChallenge =
-                currentUserChallenges.indexOf(invalidChallenge)
-
-            currentUserChallenges[indexOfInvalidChallenge] =
-                    invalidChallenge.copy(isComplete = isComplete)
-        }
-
-        return currentUserChallenges.toList()
-    }
+    private fun getCurrentUserChallenges(currentUserChallengesSnapshot: QuerySnapshot): List<Challenge> =
+        currentUserChallengesSnapshot
+            .toObjects(Challenge::class.java)
+            .toSet()
+            .toList()
 
     override var currentSkin: CatView.Skins
         get() = try {
@@ -351,12 +240,24 @@ class Prefs @Inject constructor(
         }
         set(value) {
             saveCurrentSkinToSP(value)
+            saveCurrentSkinToDB(value)
         }
 
     private fun saveCurrentSkinToSP(value: CatView.Skins) {
         authData.edit {
             putString(KEY_CURRENT_SKIN, gson.toJson(value))
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveCurrentSkinToDB(currentSkin: CatView.Skins) {
+        RxFirestore.updateDocument(currentUserDocument, userCostumeKey, currentSkin.name)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { },
+                { report(it) }
+            )
     }
 
     @SuppressLint("CheckResult")
@@ -404,12 +305,18 @@ class Prefs @Inject constructor(
         }
         set(value) {
             saveCompletedChallengesToSP(value)
+            saveCompletedChallengesToDB(value)
         }
 
     private fun saveCompletedChallengesToSP(value: List<ChallengeItem>) {
         authData.edit {
             putString(KEY_CHALLENGES, gson.toJson(value))
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveCompletedChallengesToDB(completedChallenges: List<ChallengeItem>) {
+        //todo
     }
 
     private val currentUserChallengesCollection
@@ -484,7 +391,7 @@ class Prefs @Inject constructor(
 
             dbChallenges += ChallengeItem(
                 id = challenge.id,
-                distance = challenge.distance.roundToInt(),
+                distance = challenge.distanceInKm.roundToInt(),
                 time = (challenge.minutes + challenge.hour / 60).toInt(),
                 awardRes = award,
                 isComplete = challenge.isComplete
@@ -492,6 +399,159 @@ class Prefs @Inject constructor(
         }
 
         saveCompletedChallengesToSP(dbChallenges.toList())
+    }
+
+    override var weekDistance: Double
+        get() {
+            val weekDistanceFromSP = authData.getString(KEY_DISTANCE_WEEK, "0")!!.toDouble()
+
+            asyncLoadWeekDistanceFromDBAndSave()
+
+            return weekDistanceFromSP
+        }
+        set(value) {
+            saveWeekDistanceToSP(value)
+            saveWeekDistanceToDB(value)
+        }
+
+    private fun saveWeekDistanceToSP(value: Double) {
+        authData.edit {
+            putString(KEY_DISTANCE_WEEK, value.toString())
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveWeekDistanceToDB(weekDistance: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userWeekDistanceKey, weekDistance)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { },
+                { report(it) }
+            )
+    }
+
+    @SuppressLint("CheckResult")
+    private fun asyncLoadWeekDistanceFromDBAndSave() {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForWeekDistanceChange(it) },
+                { report(it) }
+            )
+    }
+
+    private fun onGetUserDocumentForWeekDistanceChange(currentUser: DocumentSnapshot) {
+        try {
+            val currentUserInfoFromDB = currentUser.toObject(DBUser::class.java) ?: return
+
+            saveWeekDistanceToSP(currentUserInfoFromDB.weekDistance)
+        } catch (e: Exception) {
+            report(e)
+        }
+    }
+
+    override var monthDistance: Double
+        get() {
+            val monthDistanceFromSP = authData.getString(KEY_DISTANCE_MONTH, "0")!!.toDouble()
+
+            asyncLoadMonthDistanceFromDBAndSave()
+
+            return monthDistanceFromSP
+        }
+        set(value) {
+            saveMonthDistanceToSP(value)
+            saveMonthDistanceToDB(value)
+        }
+
+    private fun saveMonthDistanceToSP(value: Double) {
+        authData.edit {
+            putString(KEY_DISTANCE_MONTH, value.toString())
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveMonthDistanceToDB(monthDistance: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userMonthDistanceKey, monthDistance)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { },
+                { report(it) }
+            )
+    }
+
+    @SuppressLint("CheckResult")
+    private fun asyncLoadMonthDistanceFromDBAndSave() {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForMonthDistanceChange(it) },
+                { report(it) }
+            )
+    }
+
+    private fun onGetUserDocumentForMonthDistanceChange(currentUser: DocumentSnapshot) {
+        try {
+            val currentUserInfoFromDB = currentUser.toObject(DBUser::class.java) ?: return
+
+            saveMonthDistanceToSP(currentUserInfoFromDB.monthDistance)
+        } catch (e: Exception) {
+            report(e)
+        }
+    }
+
+    override var yearDistance: Double
+        get() {
+            val yearDistanceFromSP = authData.getString(KEY_DISTANCE_YEAR, "0")!!.toDouble()
+
+            asyncLoadYearDistanceFromDBAndSave()
+
+            return yearDistanceFromSP
+        }
+        set(value) {
+            saveYearDistanceToSP(value)
+            saveYearDistanceToDB(value)
+        }
+
+    private fun saveYearDistanceToSP(value: Double) {
+        authData.edit {
+            putString(KEY_DISTANCE_YEAR, value.toString())
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun saveYearDistanceToDB(yearDistance: Double) {
+        RxFirestore.updateDocument(currentUserDocument, userYearDistanceKey, yearDistance)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { },
+                { report(it) }
+            )
+    }
+
+    @SuppressLint("CheckResult")
+    private fun asyncLoadYearDistanceFromDBAndSave() {
+        RxFirestore.getDocument(currentUserDocument)
+            .subscribeOn(schedulers.io())
+            .subscribeOn(schedulers.ui())
+            .subscribe(
+                { onGetUserDocumentForYearDistanceChange(it) },
+                { report(it) }
+            )
+    }
+
+    private fun onGetUserDocumentForYearDistanceChange(currentUser: DocumentSnapshot) {
+        try {
+            val currentUserInfoFromDB = currentUser.toObject(DBUser::class.java) ?: return
+
+            saveYearDistanceToSP(currentUserInfoFromDB.yearDistance)
+        } catch (e: Exception) {
+            report(e)
+        }
     }
 
     private fun report(throwable: Throwable) {

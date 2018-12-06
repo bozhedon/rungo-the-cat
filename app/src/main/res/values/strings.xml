@@ -53,4 +53,7 @@
     <string name="application_needs_permissions_to_location">Для дальнейшей работы приложению необходимы права доступа к местоположению</string>
     <string name="provide">Предоставить</string>
     <string name="retry">Повторить</string>
+    <string name="internet_connection_required">Необходимо интернет соединение</string>
+    <string name="user_must_sign_in">Пользователь должен войти в аккаунт</string>
+    <string name="user">Пользователь</string>
 </resources>

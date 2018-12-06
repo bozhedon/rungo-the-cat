@@ -14,7 +14,7 @@ import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.visible
-import kotlinx.android.synthetic.main.fragment_auth.auth_button
+import kotlinx.android.synthetic.main.fragment_auth.*
 import toothpick.Toothpick
 
 class AuthFragment : BaseFragment(), AuthView {

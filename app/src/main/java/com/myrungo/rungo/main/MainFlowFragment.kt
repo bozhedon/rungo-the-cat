@@ -47,7 +47,9 @@ class MainFlowFragment : BaseFragment(), MainView {
             if (newFragment == null) add(R.id.main_container, screen.fragment, screen.screenKey)
 
             currentFragment?.let {
-                hide(it)
+                //remove потому что тогда фрагмент пересоздаётся,
+                //а значит вызовутся методы подгрузки данных (в onStart или onResume)
+                remove(it)
                 it.userVisibleHint = false
             }
             newFragment?.let {

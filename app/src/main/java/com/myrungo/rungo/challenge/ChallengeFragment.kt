@@ -23,11 +23,17 @@ class ChallengeFragment : BaseFragment(), ChallengeView {
     @ProvidePresenter
     fun providePresenter() = Toothpick
         .openScope(Scopes.APP)
-        .getInstance(ChallengePresenter::class.java)
+        .getInstance(ChallengePresenter::class.java)!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         challenge_recycler_view.adapter = adapter
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        presenter.onStart()
     }
 
     override fun showData(data: List<Any>) {
@@ -62,6 +68,7 @@ class ChallengeFragment : BaseFragment(), ChallengeView {
         fun setData(data: List<Any>) {
             items.clear()
             items.addAll(data)
+            //todo use DiffUtils
             notifyDataSetChanged()
         }
     }

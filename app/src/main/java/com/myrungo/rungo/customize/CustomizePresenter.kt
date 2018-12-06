@@ -9,8 +9,8 @@ import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.model.MainNavigationController
+import com.myrungo.rungo.model.SchedulersProvider
 import ru.terrakok.cicerone.Router
-import timber.log.Timber
 import javax.inject.Inject
 
 @InjectViewState
@@ -19,42 +19,103 @@ class CustomizePresenter @Inject constructor(
     private val navigation: MainNavigationController,
     private val authData: AuthHolder,
     private val catController: CatController,
-    private val challengeController: ChallengeController
+    private val challengeController: ChallengeController,
+    private val schedulers: SchedulersProvider
 ) : BasePresenter<CustomizeView>() {
 
     private var skinResId: Int? = null
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
+    fun onStart() {
+        showAvailableSkins()
+    }
 
+    fun onSelectClicked() {
+        if (authData.currentSkin == getSkin(skinResId ?: R.drawable.common_cat)) return
+
+        skinResId?.let {
+            catController.setSkin(getSkin(it))
+            router.navigateTo(Screens.CustomizeDone(it))
+        }
+    }
+
+    fun onDefaultSelected() {
+        skinResId = null
+        catController.setSkin(CatView.Skins.COMMON)
+    }
+
+    fun onSkinClicked(skinItem: SkinItem) {
+        if (!skinItem.isAvailable) return
+
+        val skinRes = getSkinReference(skinItem.id)
+
+        viewState.showSkinReference(skinRes)
+
+        skinResId = skinRes
+    }
+
+    fun onBackPressed() = navigation.open(0)
+
+    private fun showAvailableSkins() {
         catController.skinState
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
             .subscribe(
                 { handleSkin(it) },
-                { Timber.e(it) }
+                { report(it) }
             )
             .connect()
 
         challengeController.state
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
             .subscribe(
                 {
                     val skins = listOf(
-                        SkinItem(0, R.drawable.normal_cat_sportsuniform, true),
-                        SkinItem(1, R.drawable.bad_cat_jacket, it.awardRes == R.drawable.bad_cat_jacket),
-                        SkinItem(2, R.drawable.bussiness_cat_cloth, it.awardRes == R.drawable.bussiness_cat_cloth),
-                        SkinItem(3, R.drawable.karate_cat_kimono, it.awardRes == R.drawable.karate_cat_kimono)
+                        SkinItem(
+                            0,
+                            R.drawable.normal_cat_sportsuniform,
+                            true
+                        ),
+                        SkinItem(
+                            1,
+                            R.drawable.bad_cat_jacket,
+                            it.awardRes == R.drawable.bad_cat_jacket
+                        ),
+                        SkinItem(
+                            2,
+                            R.drawable.bussiness_cat_cloth,
+                            it.awardRes == R.drawable.bussiness_cat_cloth
+                        ),
+                        SkinItem(
+                            3,
+                            R.drawable.karate_cat_kimono,
+                            it.awardRes == R.drawable.karate_cat_kimono
+                        )
                     )
 
                     viewState.showSkins(skins)
                 },
-                { Timber.e(it) }
+                { report(it) }
             )
             .connect()
 
         val skins = listOf(
             SkinItem(0, R.drawable.normal_cat_sportsuniform, true),
-            SkinItem(1, R.drawable.bad_cat_jacket, authData.availableSkins.find { it == CatView.Skins.BAD } != null),
-            SkinItem(2, R.drawable.bussiness_cat_cloth, authData.availableSkins.find { it == CatView.Skins.BUSINESS } != null),
-            SkinItem(3, R.drawable.karate_cat_kimono, authData.availableSkins.find { it == CatView.Skins.KARATE } != null)
+            SkinItem(
+                1,
+                R.drawable.bad_cat_jacket,
+                authData.availableSkins.find { it == CatView.Skins.BAD } != null
+            ),
+            SkinItem(
+                2,
+                R.drawable.bussiness_cat_cloth,
+                authData.availableSkins.find { it == CatView.Skins.BUSINESS } != null
+            ),
+            SkinItem(
+                3,
+                R.drawable.karate_cat_kimono,
+                authData.availableSkins.find { it == CatView.Skins.KARATE } != null
+            )
         )
 
         viewState.showSkins(skins)
@@ -74,31 +135,6 @@ class CustomizePresenter @Inject constructor(
         authData.currentSkin = skin
     }
 
-    fun onSelectClicked() {
-        if (authData.currentSkin == getSkin(skinResId ?: R.drawable.common_cat)) return
-
-        skinResId?.let {
-            catController.setSkin(getSkin(it))
-            router.navigateTo(Screens.CustomizeDone(it))
-        }
-    }
-
-    fun onDefaultSelected() {
-        skinResId = null
-        catController.setSkin(CatView.Skins.COMMON)
-    }
-
-    fun onSkinClicked(skin: SkinItem) {
-        if (!skin.isAvailable) return
-
-        val skinRes = getSkinReference(skin.id)
-
-        viewState.showSkinReference(skinRes)
-        skinResId = skinRes
-    }
-
-    fun onBackPressed() = navigation.open(0)
-
     private fun getSkinReference(id: Int) = when (id) {
         0 -> R.drawable.normal_cat
         1 -> R.drawable.bad_cat
@@ -115,4 +151,5 @@ class CustomizePresenter @Inject constructor(
         R.drawable.karate_cat -> CatView.Skins.KARATE
         else -> CatView.Skins.COMMON
     }
+
 }

@@ -8,7 +8,7 @@ import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.list.HeaderItem
 import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.ResourceManager
-import timber.log.Timber
+import com.myrungo.rungo.model.SchedulersProvider
 import javax.inject.Inject
 
 @InjectViewState
@@ -16,13 +16,26 @@ class ChallengePresenter @Inject constructor(
     private val navigation: MainNavigationController,
     private val resourceManager: ResourceManager,
     private val challengeController: ChallengeController,
-    private val authData: AuthHolder
+    private val authData: AuthHolder,
+    private val schedulersProvider: SchedulersProvider
 ) : BasePresenter<ChallengeView>() {
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
+    fun onStart() {
+        showChallenges()
+    }
 
+    fun onChallengeClicked(challenge: ChallengeItem) {
+        if (challenge.isComplete) return
+
+        viewState.showAcceptDialog(challenge)
+    }
+
+    fun onBackPressed() = navigation.open(0)
+
+    private fun showChallenges() {
         challengeController.state
+            .subscribeOn(schedulersProvider.io())
+            .observeOn(schedulersProvider.ui())
             .subscribe(
                 {
                     viewState.showData(
@@ -34,7 +47,7 @@ class ChallengePresenter @Inject constructor(
                         )
                     )
                 },
-                { Timber.e(it) }
+                { report(it) }
             )
             .connect()
 
@@ -63,11 +76,4 @@ class ChallengePresenter @Inject constructor(
         )
     }
 
-    fun onChallengeClicked(challenge: ChallengeItem) {
-        if (challenge.isComplete) return
-
-        viewState.showAcceptDialog(challenge)
-    }
-
-    fun onBackPressed() = navigation.open(0)
 }

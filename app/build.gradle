@@ -11,8 +11,8 @@ android {
         applicationId "com.myrungo.rungo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 9
-        versionName "1.0-rc05"
+        versionCode 10
+        versionName "1.0-rc06"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
@@ -75,7 +75,7 @@ dependencies {
     implementation 'com.hannesdorfmann:adapterdelegates3:3.1.0'
 
     //Gson
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
 
     //Log
     implementation 'com.jakewharton.timber:timber:4.7.1'

@@ -38,7 +38,7 @@ class ProfilePresenter @Inject constructor(
         catController.skinState
             .subscribe(
                 { handleSkin(it) },
-                { Timber.e(it) }
+                { report(it) }
             )
             .connect()
 

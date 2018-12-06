@@ -9,10 +9,10 @@ import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.challenge.ChallengeItem
-import com.myrungo.rungo.constants.challengesCollection
-import com.myrungo.rungo.constants.trainingsCollection
-import com.myrungo.rungo.constants.userTotalDistanceKey
-import com.myrungo.rungo.constants.usersCollection
+import com.myrungo.rungo.utils.constants.challengesCollection
+import com.myrungo.rungo.utils.constants.trainingsCollection
+import com.myrungo.rungo.utils.constants.userTotalDistanceKey
+import com.myrungo.rungo.utils.constants.usersCollection
 import com.myrungo.rungo.model.MainNavigationController
 import com.myrungo.rungo.model.SchedulersProvider
 import com.myrungo.rungo.model.database.AppDatabase
@@ -261,10 +261,10 @@ class RunPresenter @Inject constructor(
 
     private fun saveTrainingToDB(endTime: Long) {
         val trainingInfo = Training(
-            distance = distanceInKm,
+            distanceInKm = distanceInKm,
             startTime = startTime,
             endTime = endTime,
-            averageSpeed = avgSpeedInKmH
+            averageSpeedInKmH = avgSpeedInKmH
         )
 
         RxFirestore.addDocument(currentUserTrainingsCollection, trainingInfo)
@@ -295,7 +295,7 @@ class RunPresenter @Inject constructor(
         val hours = timeInSeconds / 3600.0
 
         val challengeInfo = Challenge(
-            distance = distanceInKm,
+            distanceInKm = distanceInKm,
             hour = hours,
             id = challenge.id,
             imgURL = "",
@@ -304,7 +304,7 @@ class RunPresenter @Inject constructor(
             reward = award.name,
             startTime = startTime,
             endTime = endTime,
-            averageSpeed = avgSpeedInKmH
+            averageSpeedInKmH = avgSpeedInKmH
         )
 
         RxFirestore.addDocument(currentUserChallengesCollection, challengeInfo)

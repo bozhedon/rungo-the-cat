@@ -14,10 +14,10 @@ import com.myrungo.rungo.AppActivity
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.Screens
 import com.myrungo.rungo.cat.CatController
-import com.myrungo.rungo.constants.usersCollection
 import com.myrungo.rungo.model.DBUser
 import com.myrungo.rungo.model.FlowRouter
 import com.myrungo.rungo.model.SchedulersProvider
+import com.myrungo.rungo.utils.constants.*
 import durdinapps.rxfirebase2.RxFirestore
 import javax.inject.Inject
 
@@ -163,13 +163,13 @@ class AuthPresenter @Inject constructor(
             photoUri.toString()
         }
 
-        map["email"] = email
-        map["isAnonymous"] = isAnonymous
-        map["photoUri"] = photoUrl
-        map["provider"] = provider
-        map["uid"] = uid
-        map["phoneNumber"] = phoneNumber
-        map["name"] = displayName
+        map[userEmailKey] = email
+        map[userIsAnonymousKey] = isAnonymous
+        map[userPhotoUriKey] = photoUrl
+        map[userProviderKey] = provider
+        map[userUidKey] = uid
+        map[userPhoneNumberKey] = phoneNumber
+        map[userNameKey] = displayName
 
         return map
     }
@@ -207,7 +207,7 @@ class AuthPresenter @Inject constructor(
             phoneNumber = phoneNumber,
             photoUri = photoUrl,
             provider = provider,
-            reg_date = creationTimestamp,
+            regDate = creationTimestamp,
             uid = uid,
             age = 0,
             costume = authData.currentSkin.name,

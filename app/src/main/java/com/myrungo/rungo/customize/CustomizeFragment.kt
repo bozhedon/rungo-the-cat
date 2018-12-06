@@ -22,13 +22,19 @@ class CustomizeFragment : BaseFragment(), CustomizeView {
     @ProvidePresenter
     fun providePresenter() = Toothpick
         .openScope(Scopes.APP)
-        .getInstance(CustomizePresenter::class.java)
+        .getInstance(CustomizePresenter::class.java)!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         custom_recycler_view.adapter = adapter
         custom_check_button.setOnClickListener { presenter.onSelectClicked() }
         custom_default_button.setOnClickListener { presenter.onDefaultSelected() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        presenter.onStart()
     }
 
     override fun showSkinReference(resId: Int) {
@@ -59,6 +65,7 @@ class CustomizeFragment : BaseFragment(), CustomizeView {
         fun setData(data: List<Any>) {
             items.clear()
             items.addAll(data)
+            //todo use DiffUtils
             notifyDataSetChanged()
         }
     }

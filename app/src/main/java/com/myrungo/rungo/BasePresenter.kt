@@ -43,7 +43,7 @@ open class BasePresenter<V : MvpView> : MvpPresenter<V>() {
                     "; task.isSuccessful() == " +
                     successful
 
-            Timber.d(msg)
+//            Timber.d(msg)
 
             if (successful || canceled || complete) {
                 break
