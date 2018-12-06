@@ -35,7 +35,7 @@
     <string name="zero_time">00:00:00</string>
 
     <!-- Run -->
-    <string name="run_distance_title">километры</string>
+    <string name="run_distance_title">пройдено (км)</string>
     <string name="time_title">время</string>
     <string name="speed_title">тек. скорость</string>
     <string name="speed">%.1f км/ч</string>
@@ -52,4 +52,5 @@
     <string name="go_to">Перейти</string>
     <string name="application_needs_permissions_to_location">Для дальнейшей работы приложению необходимы права доступа к местоположению</string>
     <string name="provide">Предоставить</string>
+    <string name="retry">Повторить</string>
 </resources>

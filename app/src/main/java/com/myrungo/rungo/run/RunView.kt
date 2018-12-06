@@ -1,11 +1,10 @@
 package com.myrungo.rungo.run
 
-import android.location.Location
+import android.support.design.widget.Snackbar
 import com.arellomobile.mvp.MvpView
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy
 import com.arellomobile.mvp.viewstate.strategy.OneExecutionStateStrategy
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
-import com.google.android.gms.maps.model.LatLng
 import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.model.database.entity.LocationDb
 
@@ -19,9 +18,10 @@ interface RunView : MvpView {
     fun run(isRun: Boolean)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
-    fun drawRoute (locationDb: LocationDb)
+    fun drawRoute(locationDb: LocationDb)
+
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun showDialog(title: String, msg: String, tag: String)
 
-    fun showMessage(message: String?)
+    fun showMessage(message: String?, duration: Int = Snackbar.LENGTH_LONG)
 }

@@ -95,15 +95,13 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
         AlertFragment.create(title, msg, tag).show(childFragmentManager, tag)
     }
 
-    override fun showMessage(message: String?) {
+    override fun showMessage(message: String?, duration: Int) {
         if (message != null) {
-            val activity = activity
-
-            if (activity != null) {
+            activity?.let {
                 Snackbar.make(
-                    activity.findViewById<View>(android.R.id.content),
+                    it.findViewById<View>(android.R.id.content),
                     message,
-                    Snackbar.LENGTH_LONG
+                    duration
                 ).show()
             }
         }

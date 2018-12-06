@@ -25,7 +25,7 @@ data class DBUser(
     /**
      * Primary key
      */
-    var uid: String,
+    var uid: String = "",
 
     var age: Int = 0,
 
@@ -33,6 +33,12 @@ data class DBUser(
 
     var height: Int = 0,
 
-    var totalDistance: Double = 0.0
+    var totalDistance: Double = 0.0,
+
+    val weekDistance: Double = 0.0,
+
+    val monthDistance: Double = 0.0,
+
+    val yearDistance: Double = 0.0
 
 )

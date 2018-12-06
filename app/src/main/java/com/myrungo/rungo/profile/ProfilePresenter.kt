@@ -42,7 +42,7 @@ class ProfilePresenter @Inject constructor(
             )
             .connect()
 
-        viewState.showDetails(authData.name, authData.totalDistance)
+        viewState.showDetails(authData.name, authData.totalDistanceInKm)
     }
 
     fun onTabClicked(position: Int) {

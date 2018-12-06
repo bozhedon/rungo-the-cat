@@ -14,7 +14,7 @@ import com.myrungo.rungo.BaseFragment
 import com.myrungo.rungo.R
 import com.myrungo.rungo.Scopes
 import com.myrungo.rungo.visible
-import kotlinx.android.synthetic.main.fragment_auth.*
+import kotlinx.android.synthetic.main.fragment_auth.auth_button
 import toothpick.Toothpick
 
 class AuthFragment : BaseFragment(), AuthView {
@@ -56,7 +56,7 @@ class AuthFragment : BaseFragment(), AuthView {
                 activity!!.findViewById<View>(android.R.id.content),
                 context!!.getString(R.string.no_internet_connection),
                 Snackbar.LENGTH_INDEFINITE
-            ).setAction("Повторить?") {
+            ).setAction("${getString(R.string.retry)}?") {
                 signIn()
             }.show()
 
@@ -79,7 +79,7 @@ class AuthFragment : BaseFragment(), AuthView {
             activity!!.findViewById<View>(android.R.id.content),
             message,
             Snackbar.LENGTH_INDEFINITE
-        ).setAction("Повторить?") {
+        ).setAction("${getString(R.string.retry)}?") {
             signIn()
         }.show()
     }

@@ -11,8 +11,8 @@ android {
         applicationId "com.myrungo.rungo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 8
-        versionName "1.0-rc04"
+        versionCode 9
+        versionName "1.0-rc05"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [

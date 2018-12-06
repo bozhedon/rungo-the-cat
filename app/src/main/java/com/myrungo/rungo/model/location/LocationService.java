@@ -1,28 +1,44 @@
 package com.myrungo.rungo.model.location;
 
 import android.Manifest;
-import android.app.*;
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.*;
+import android.os.Build;
+import android.os.IBinder;
+import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import com.google.android.gms.location.*;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.myrungo.rungo.AppActivity;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.Scopes;
 import com.myrungo.rungo.model.SchedulersProvider;
 import com.myrungo.rungo.model.database.AppDatabase;
 import com.myrungo.rungo.model.database.entity.LocationDb;
+
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import timber.log.Timber;
 import toothpick.Toothpick;
-
-import javax.inject.Inject;
 
 public class LocationService extends Service {
     private static final String TAG = LocationService.class.getSimpleName();
@@ -33,34 +49,29 @@ public class LocationService extends Service {
 
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
-    private Location mLocation;
+    private Location currentLocation;
     private LocationRequest mLocationRequest;
     private NotificationManager mNotificationManager;
-    private Double mDistance = 0.0;
+    private Double distanceInMeters = 0.0;
 
-    @Inject AppDatabase database;
-    @Inject TraininigListener trainingListener;
-    @Inject SchedulersProvider schedulers;
+    @Inject
+    AppDatabase database;
+    @Inject
+    TraininigListener trainingListener;
+    @Inject
+    SchedulersProvider schedulers;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public LocationService() {
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
         Toothpick.inject(this, Toothpick.openScope(Scopes.APP));
 
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // Android O requires a Notification Channel.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            // Create the channel for the notification
-            NotificationChannel mChannel =
-                    new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
-            // Set the Notification Channel for the Notification Manager.
-            mNotificationManager.createNotificationChannel(mChannel);
-        }
+        createNotificationChannel();
 
         mLocationRequest = new LocationRequest()
                 .setInterval(UPDATE_INTERVAL_IN_MILLISECONDS)
@@ -76,19 +87,48 @@ public class LocationService extends Service {
         };
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+        if (isLocationPermissionsGranted()) {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
         }
 
         startForeground(NOTIFICATION_ID, getNotification());
     }
 
+    private void createNotificationChannel() {
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
+        // Android O requires a Notification Channel.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            @NonNull final CharSequence name = getString(R.string.app_name);
+            // Create the channel for the notification
+            @NonNull final NotificationChannel mChannel =
+                    new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+            // Set the Notification Channel for the Notification Manager.
+            mNotificationManager.createNotificationChannel(mChannel);
+        }
+    }
+
+    private boolean isLocationPermissionsGranted() {
+        final boolean fineLocationPermissionGranted =
+                ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED;
+
+        final boolean coarseLocationPermissionGranted =
+                ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED;
+
+        return fineLocationPermissionGranted && coarseLocationPermissionGranted;
+    }
+
+    @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
-      return null;
+    public IBinder onBind(@NonNull final Intent intent) {
+        return null;
     }
 
     @Override
@@ -99,9 +139,9 @@ public class LocationService extends Service {
         super.onDestroy();
     }
 
-    private void onNewLocation(final Location location) {
-        if (mLocation == null) {
-            mLocation = location;
+    private void onNewLocation(final Location newLocation) {
+        if (currentLocation == null) {
+            currentLocation = newLocation;
             return;
         }
 
@@ -109,46 +149,61 @@ public class LocationService extends Service {
             return;
         }
 
-        //proverka na tochnost
-        if (location.distanceTo(mLocation) > location.getAccuracy() + mLocation.getAccuracy()) {
-            mDistance += location.distanceTo(mLocation);
-            mLocation = location;
+        if (isLocationAccuracy(newLocation)) {
+            distanceInMeters += newLocation.distanceTo(currentLocation);
+            currentLocation = newLocation;
 
-            compositeDisposable.add(
-                    Completable.fromAction(new Action() {
+            @NonNull final Disposable task = Completable
+                    .fromAction(new Action() {
                         @Override
-                        public void run() throws Exception {
-                            database.getLocationDao().insert(new LocationDb(mLocation.getLatitude(), mLocation.getLongitude(), 0));
+                        public void run() {
+                            @NonNull final LocationDb locationDb = new LocationDb(
+                                    currentLocation.getLatitude(),
+                                    currentLocation.getLongitude(),
+                                    0
+                            );
+
+                            database.getLocationDao().insert(locationDb);
                         }
                     })
-                            .subscribeOn(schedulers.io())
-                            .doOnError(new Consumer<Throwable>() {
-                                @Override
-                                public void accept(Throwable throwable) throws Exception {
-                                    Timber.e(throwable);
-                                }
-                            })
-                            .subscribe()
-            );
+                    .subscribeOn(schedulers.io())
+                    .doOnError(new Consumer<Throwable>() {
+                        @Override
+                        public void accept(@NonNull final Throwable throwable) {
+                            Timber.e(throwable);
+                        }
+                    })
+                    .subscribe();
 
-            trainingListener.send(mDistance, mLocation.getSpeed());
+            compositeDisposable.add(task);
+
+            trainingListener.send(distanceInMeters, currentLocation.getSpeed());
             mNotificationManager.notify(NOTIFICATION_ID, getNotification());
         }
     }
 
+    private boolean isLocationAccuracy(@NonNull final Location newLocation) {
+        return newLocation.distanceTo(currentLocation) > newLocation.getAccuracy() + currentLocation.getAccuracy();
+    }
+
+    @NonNull
     private Notification getNotification() {
-        Intent intent = new Intent(this, AppActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        @NonNull final Intent intent = new Intent(this, AppActivity.class);
+        @NonNull final PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        @NonNull final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.notification_title))
-                .setContentText(String.valueOf(mDistance.intValue()) + " " + getString(R.string.meter))
+                .setContentText(String.valueOf(distanceInMeters.intValue()) + " " + getString(R.string.meter))
                 .setOngoing(true)
                 .setContentIntent(pendingIntent)
                 .setPriority(Notification.PRIORITY_HIGH)
-                .setSmallIcon(R.drawable.ic_cat);
+                .setSmallIcon(R.drawable.ic_cat)
+                .setShowWhen(false);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(CHANNEL_ID);
         }
+
         return builder.build();
     }
 }
