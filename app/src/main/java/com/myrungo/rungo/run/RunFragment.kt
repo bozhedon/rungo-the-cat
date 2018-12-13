@@ -89,6 +89,7 @@ class RunFragment : BaseFragment(), RunView, AlertFragment.OnClickListener, OnMa
 
     override fun onMapReady(googleMap: GoogleMap?) {
         map = googleMap
+        map?.setMyLocationEnabled(true)
     }
 
     override fun showDialog(title: String, msg: String, tag: String) {

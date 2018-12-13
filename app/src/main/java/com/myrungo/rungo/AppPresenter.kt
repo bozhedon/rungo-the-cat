@@ -39,4 +39,7 @@ class AppPresenter @Inject constructor(
     fun initAuthScreen() {
         router.newRootScreen(Screens.AuthFlow)
     }
+    fun initWelcomeScreen() {
+        router.newRootScreen(Screens.Welcome)
+    }
 }

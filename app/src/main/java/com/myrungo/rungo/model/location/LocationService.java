@@ -41,7 +41,7 @@ import timber.log.Timber;
 import toothpick.Toothpick;
 
 public class LocationService extends Service {
-    private static final String TAG = LocationService.class.getSimpleName();
+
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "channel_1";
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 2000;
@@ -140,7 +140,7 @@ public class LocationService extends Service {
     }
 
     private void onNewLocation(final Location newLocation) {
-        if (currentLocation == null) {
+        if ((currentLocation == null) && (newLocation.getAccuracy()<10)){
             currentLocation = newLocation;
             return;
         }
@@ -148,38 +148,38 @@ public class LocationService extends Service {
         if (!trainingListener.isRun()) {
             return;
         }
+        if(currentLocation!=null) {
+            if (isLocationAccuracy(newLocation)) {
+                distanceInMeters += newLocation.distanceTo(currentLocation);
+                currentLocation = newLocation;
 
-        if (isLocationAccuracy(newLocation)) {
-            distanceInMeters += newLocation.distanceTo(currentLocation);
-            currentLocation = newLocation;
+                @NonNull final Disposable task = Completable
+                        .fromAction(new Action() {
+                            @Override
+                            public void run() {
+                                @NonNull final LocationDb locationDb = new LocationDb(
+                                        currentLocation.getLatitude(),
+                                        currentLocation.getLongitude(),
+                                        0
+                                );
 
-            @NonNull final Disposable task = Completable
-                    .fromAction(new Action() {
-                        @Override
-                        public void run() {
-                            @NonNull final LocationDb locationDb = new LocationDb(
-                                    currentLocation.getLatitude(),
-                                    currentLocation.getLongitude(),
-                                    0
-                            );
+                                database.getLocationDao().insert(locationDb);
+                            }
+                        })
+                        .subscribeOn(schedulers.io())
+                        .doOnError(new Consumer<Throwable>() {
+                            @Override
+                            public void accept(@NonNull final Throwable throwable) {
+                                Timber.e(throwable);
+                            }
+                        })
+                        .subscribe();
 
-                            database.getLocationDao().insert(locationDb);
-                        }
-                    })
-                    .subscribeOn(schedulers.io())
-                    .doOnError(new Consumer<Throwable>() {
-                        @Override
-                        public void accept(@NonNull final Throwable throwable) {
-                            Timber.e(throwable);
-                        }
-                    })
-                    .subscribe();
-
-            compositeDisposable.add(task);
-
-            trainingListener.send(distanceInMeters, currentLocation.getSpeed());
-            mNotificationManager.notify(NOTIFICATION_ID, getNotification());
+                compositeDisposable.add(task);
+                mNotificationManager.notify(NOTIFICATION_ID, getNotification());
+            }
         }
+        trainingListener.send(distanceInMeters,newLocation.getSpeed(), newLocation.getAccuracy());
     }
 
     private boolean isLocationAccuracy(@NonNull final Location newLocation) {
@@ -195,6 +195,7 @@ public class LocationService extends Service {
                 .setContentTitle(getString(R.string.notification_title))
                 .setContentText(String.valueOf(distanceInMeters.intValue()) + " " + getString(R.string.meter))
                 .setOngoing(true)
+                .setVibrate(new long[] {0L})
                 .setContentIntent(pendingIntent)
                 .setPriority(Notification.PRIORITY_HIGH)
                 .setSmallIcon(R.drawable.ic_cat)

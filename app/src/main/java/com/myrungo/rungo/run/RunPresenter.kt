@@ -57,6 +57,14 @@ class RunPresenter @Inject constructor(
 
     private var startTime: Long = 0
 
+    private var isShow: Boolean = false
+
+    private var isGetLocation: Boolean = false
+
+    private var count: Int =  0
+
+    private var minAccuracy: Double = 100.0
+
     private val challengeTime =
         if (challenge.id != ChallengeController.EMPTY.id) "${challenge.time / 100}:${challenge.time % 100}"
         else ""
@@ -93,9 +101,20 @@ class RunPresenter @Inject constructor(
                 viewState.showDistance("%.1f".format(0.0), challengeDistance)
             }
             .subscribe(
-                { (distanceInMeters, speedInMS) ->
+                { (distanceInMeters, speedInMS, accuracy) ->
                     distanceInKm = distanceInMeters / 1000
-
+                    isGetLocation=true
+                    count++
+                    if(accuracy<minAccuracy)
+                        minAccuracy=accuracy
+                    if ((count==5) && (!isShow) && (minAccuracy>10)) {
+                        viewState.showDialog(
+                            title = "Слабый сигнал GPS",
+                            msg = "Там, где ты сейчас находишься, очень слабый сигнал GPS. Для точного учета необходимо находиться на открытом воздухе в зоне прямой видимости неба. Ты можешь продолжить тренировку, но мы не гарантируем точность данных.",
+                            tag = DIALOG_TAG
+                        )
+                        isShow=true
+                    }
                     if (timeInSeconds != 0) {
                         avgSpeedInKmH = distanceInMeters * 3.6 / timeInSeconds
 
@@ -131,7 +150,14 @@ class RunPresenter @Inject constructor(
                 {
                     timeInSeconds++
                     viewState.showTime(timeInSeconds.toTime(), challengeTime)
-
+                    if((timeInSeconds==5) && (!isGetLocation) && (!isShow)) {
+                        viewState.showDialog(
+                            title = "Отсутствует сигнал GPS",
+                            msg = "Там, где ты сейчас находишься, отсутствует сигнал GPS. Для точного учета необходимо находиться на открытом воздухе в зоне прямой видимости неба. Ты можешь продолжить тренировку, но мы не гарантируем точность данных.",
+                            tag = DIALOG_TAG
+                        )
+                        isShow=true
+                    }
                     val h = challenge.time / 100
                     val m = challenge.time % 100
 

@@ -8,5 +8,5 @@ class TraininigListener {
     var isRun = false
 
     fun listen(): Observable<TrainingInfo> = infoRelay
-    fun send(distance: Double, speed: Double) = infoRelay.accept(TrainingInfo(distance, speed))
+    fun send(distance: Double, speed: Double, accuracy: Double) = infoRelay.accept(TrainingInfo(distance, speed, accuracy))
 }
