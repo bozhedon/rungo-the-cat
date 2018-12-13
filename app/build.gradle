@@ -17,7 +17,7 @@ android {
             annotationProcessorOptions {
                 arguments = [
                         'toothpick_registry_package_name': 'com.myrungo.rungo',
-                        'room.schemaLocation': "$projectDir/schemas".toString()
+                        'room.schemaLocation'            : "$projectDir/schemas".toString()
                 ]
             }
         }
@@ -81,7 +81,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
     //Crashlytics
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.6'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
 
     //Analytics
     implementation 'com.yandex.android:mobmetricalib:3.4.0'

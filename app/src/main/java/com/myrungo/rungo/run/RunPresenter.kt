@@ -1,9 +1,12 @@
 package com.myrungo.rungo.run
 
+import android.preference.PreferenceManager
+import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.myrungo.rungo.BasePresenter
+import com.myrungo.rungo.Screens
 import com.myrungo.rungo.auth.AuthHolder
 import com.myrungo.rungo.cat.CatController
 import com.myrungo.rungo.cat.CatView
@@ -195,9 +198,13 @@ class RunPresenter @Inject constructor(
     fun exit() {
         val endTime = System.currentTimeMillis()
 
+        val isItChallenge = challenge.id != ChallengeController.EMPTY.id
+
         saveTotalDistanceToDB()
 
-        val isItChallenge = challenge.id != ChallengeController.EMPTY.id
+        ChallengeController.getAward(challenge)?.let { award ->
+            saveChallengeToSP(award)
+        }
 
         if (isComplete && isItChallenge) {
             challengeController.finishChallenge(challenge)
@@ -210,6 +217,8 @@ class RunPresenter @Inject constructor(
 
             navigationController.open(1)
             return
+        } else {
+            saveResultToDB(endTime)
         }
 
         saveTrainingToDB(endTime)
@@ -219,7 +228,7 @@ class RunPresenter @Inject constructor(
             .subscribe({}, { Timber.e(it) })
             .connect()
 
-        router.exit()
+        router.newRootScreen(Screens.ChallengeDone)
     }
 
     private fun saveTotalDistanceToDB() {
@@ -302,6 +311,39 @@ class RunPresenter @Inject constructor(
             isComplete = isComplete,
             minutes = minutes,
             reward = award.name,
+            startTime = startTime,
+            endTime = endTime,
+            averageSpeedInKmH = avgSpeedInKmH
+        )
+
+        RxFirestore.addDocument(currentUserChallengesCollection, challengeInfo)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe(
+                { router.exit() },
+                {
+                    Timber.e(it)
+                    report(it)
+                    viewState.showMessage(it.message)
+                    router.exit()
+                }
+            )
+            .connect()
+    }
+
+    private fun saveResultToDB(endTime: Long){
+        val minutes = timeInSeconds / 60.0
+
+        val hours = timeInSeconds / 3600.0
+
+        val challengeInfo = Challenge(
+            distanceInKm = distanceInKm,
+            hour = hours,
+            id = challenge.id,
+            imgURL = "",
+            isComplete = isComplete,
+            minutes = minutes,
+            reward = "",
             startTime = startTime,
             endTime = endTime,
             averageSpeedInKmH = avgSpeedInKmH

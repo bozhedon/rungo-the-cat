@@ -56,4 +56,8 @@
     <string name="internet_connection_required">Необходимо интернет соединение</string>
     <string name="user_must_sign_in">Пользователь должен войти в аккаунт</string>
     <string name="user">Пользователь</string>
+    <string name="take_your_gift">Забери свой подарок!</string>
+    <string name="challenge_done">ВЫЗОВ ВЫПОЛНЕН!</string>
+    <string name="challenge_good_job">МОЛОДЕЦ!</string>
+    <string name="challenge_failed">ВЫЗОВ НЕ ВЫПОЛНЕН!</string>
 </resources>

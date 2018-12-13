@@ -11,4 +11,8 @@
 
     <color name="run_active_background">#F2994A</color>
     <color name="run_accent_background">#6A421E</color>
+
+    <color name="colorGreen">#52AE87</color>
+    <color name="colorGray">#C4C4C4</color>
+    <color name="colorBrown">#535353</color>
 </resources>
