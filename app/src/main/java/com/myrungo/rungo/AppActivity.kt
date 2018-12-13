@@ -17,8 +17,6 @@ import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import ru.terrakok.cicerone.commands.Command
 import toothpick.Toothpick
 import javax.inject.Inject
-import android.preference.PreferenceManager
-import android.content.SharedPreferences
 
 
 
@@ -58,13 +56,9 @@ class AppActivity : MvpAppCompatActivity(), MvpView {
 
         if (savedInstanceState == null) {
             val account = GoogleSignIn.getLastSignedInAccount(this)
-            val preferences = PreferenceManager.getDefaultSharedPreferences(baseContext)
-            val isFirstStart = preferences.getBoolean("first", true)
+
 
             if (account != null && FirebaseAuth.getInstance().currentUser != null) {
-                if (isFirstStart)
-                    presenter.initWelcomeScreen()
-                else
                     presenter.initMainScreen(account)
             } else {
                 presenter.initAuthScreen()
