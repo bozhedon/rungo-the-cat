@@ -1,35 +1,75 @@
 {
   "project_info": {
-    "project_number": "344687089943",
-    "firebase_url": "https://rungo-the-cat.firebaseio.com",
-    "project_id": "rungo-the-cat",
-    "storage_bucket": "rungo-the-cat.appspot.com"
+    "project_number": "16007015268",
+    "firebase_url": "https://rungoapp-1541446428801.firebaseio.com",
+    "project_id": "rungoapp-1541446428801",
+    "storage_bucket": "rungoapp-1541446428801.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:344687089943:android:06b2fcff68d2471f",
+        "mobilesdk_app_id": "1:16007015268:android:06b2fcff68d2471f",
         "android_client_info": {
           "package_name": "com.myrungo.rungo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "344687089943-t0d1jijrotl5edht022shn41i1jc3svk.apps.googleusercontent.com",
+          "client_id": "16007015268-ie1vht0itfaihn7fj73sugd51kd55k14.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.myrungo.rungo",
-            "certificate_hash": "b601fd5cedcd303295a2d699a532e88a65e79cc3"
+            "certificate_hash": "4f172be822964550931bdd4cf0e246f85a317eab"
           }
         },
         {
-          "client_id": "344687089943-beo8c3ftcom94tgstaleph00vqhckic4.apps.googleusercontent.com",
+          "client_id": "16007015268-15s4ssep24n99c2cgdillvldlck110e7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "b315785c67c5f994eef2a01f0a65751d6c291823"
+          }
+        },
+        {
+          "client_id": "16007015268-d9tk7btfrmce5aa9th0l7jq8crdieppb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "931d72106a461d593531b8e222a2cacf82a06a8a"
+          }
+        },
+        {
+          "client_id": "16007015268-hin4fjlo4r6marms9t9uunfckkmg7dn8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "869e7a974889d1e36d7213e4cf9bf06e01ae487e"
+          }
+        },
+        {
+          "client_id": "16007015268-6ro2id9jqcgs1n27puj3krstnf848ttp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "3ace865fb0bb4ad1804cfb5ad0172a891f9e2946"
+          }
+        },
+        {
+          "client_id": "16007015268-7r414kmiogltfuesjuhg8t45pevjf67a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "316e4b0abec18b6a2d20d1aa5070b19d7d23bd6e"
+          }
+        },
+        {
+          "client_id": "16007015268-hnf1l1cc38bm20furo261g8if5tm3h2s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBJmnqIgp8nIENXYp7tRXwn295tvi---Nc"
+          "current_key": "AIzaSyCn2gSXWNQAqTKog2Xgm5R1fvL_K6Uvwfc"
         }
       ],
       "services": {
@@ -40,7 +80,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "344687089943-beo8c3ftcom94tgstaleph00vqhckic4.apps.googleusercontent.com",
+              "client_id": "16007015268-hnf1l1cc38bm20furo261g8if5tm3h2s.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

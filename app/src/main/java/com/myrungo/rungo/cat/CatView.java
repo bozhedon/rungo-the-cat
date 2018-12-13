@@ -176,7 +176,7 @@ public class CatView extends ConstraintLayout {
 
         switch (head) {
             case COMMON:
-                Glide.with(this).load(R.drawable.head_common).into(this.head);
+                Glide.with(this).load(R.drawable.head_common_png).into(this.head);
                 break;
 
             case HAPPY_1:
@@ -188,7 +188,7 @@ public class CatView extends ConstraintLayout {
                 break;
 
             case SAD:
-                Glide.with(this).load(R.drawable.head_sad).into(this.head);
+                Glide.with(this).load(R.drawable.head_sad_png).into(this.head);
                 eyeLeft.setVisibility(View.VISIBLE);
                 eyeRight.setVisibility(View.VISIBLE);
                 break;
