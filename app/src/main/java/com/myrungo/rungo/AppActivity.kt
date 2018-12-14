@@ -18,6 +18,8 @@ import ru.terrakok.cicerone.commands.Command
 import toothpick.Toothpick
 import javax.inject.Inject
 
+
+
 class AppActivity : MvpAppCompatActivity(), MvpView {
 
     @InjectPresenter
@@ -55,8 +57,9 @@ class AppActivity : MvpAppCompatActivity(), MvpView {
         if (savedInstanceState == null) {
             val account = GoogleSignIn.getLastSignedInAccount(this)
 
+
             if (account != null && FirebaseAuth.getInstance().currentUser != null) {
-                presenter.initMainScreen(account)
+                    presenter.initMainScreen(account)
             } else {
                 presenter.initAuthScreen()
             }

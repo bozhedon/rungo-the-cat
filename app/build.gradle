@@ -122,6 +122,9 @@ dependencies {
         exclude group: 'com.android.support'
     }
     implementation 'com.github.FrangSierra:RxFirebase:1.5.6'
+
+    //Onboarding
+    implementation 'com.github.paolorotolo:appintro:4.1.0'
 }
 
 //for @Parcelize
