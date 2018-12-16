@@ -1,16 +1,19 @@
 package com.myrungo.rungo.challenge.done
 
 import com.arellomobile.mvp.InjectViewState
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.myrungo.rungo.BasePresenter
 import com.myrungo.rungo.Screens
+import com.myrungo.rungo.cat.CatView
 import com.myrungo.rungo.challenge.ChallengeController
 import com.myrungo.rungo.challenge.ChallengeItem
 import com.myrungo.rungo.utils.constants.challengesCollection
 import com.myrungo.rungo.utils.constants.trainingsCollection
 import com.myrungo.rungo.utils.constants.usersCollection
 import ru.terrakok.cicerone.Router
+import timber.log.Timber
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -28,6 +31,8 @@ class ChallengeDonePresenter @Inject constructor(
         if (challengeItem.id != ChallengeController.EMPTY.id) challengeItem.distance.toString()
         else ""
 
+    private val challengeGift = challengeItem.awardRes
+
     private val currentUser
         get() = FirebaseAuth.getInstance().currentUser
             ?: throw RuntimeException("")
@@ -41,20 +46,21 @@ class ChallengeDonePresenter @Inject constructor(
         get() = currentUserDocument.collection(challengesCollection)
             .orderBy("endTime")
 
-    private val currentUserTrainingCollection
-        get() = currentUserDocument.collection(trainingsCollection)
-            .orderBy("endTime")
-
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         getUserTime()
         getAverageSpeed()
         getDistance()
         getLayout()
+        getGift(challengeGift)
     }
 
     fun onHomeClicked() {
         router.navigateTo(Screens.MainFlow)
+    }
+
+    private fun getGift(resId : Int) {
+        viewState.showGift(resId)
     }
 
     private fun getUserTime() {
@@ -92,28 +98,16 @@ class ChallengeDonePresenter @Inject constructor(
         viewState.showDistance(curDistance.toString(), challengeDistance)
     }
 
-    private fun getGift() {
-
-    }
-
     private fun getLayout() {
-        val isChallengeState = true
         val task = currentUserChallengeCollection.get()
-        val trainingTask = currentUserTrainingCollection.get()
-        waitForAnyResult(trainingTask)
         waitForAnyResult(task)
         val currentUserChallengeCollectionSnapshot = task.result
         val isComplete: Boolean =
             currentUserChallengeCollectionSnapshot!!.documents.last().get("isComplete").toString().toBoolean()
 
-        currentUserChallengeCollectionSnapshot.documents.last().get("isComplete").toString().toBoolean()
-
-        if (isComplete && isChallengeState) {
+        if (isComplete) {
             viewState.showLayout(0)
-        }
-        if (!isComplete && isChallengeState) {
-            viewState.showLayout(2)
-        } else if (!isChallengeState) {
+        } else {
             viewState.showLayout(1)
         }
     }
