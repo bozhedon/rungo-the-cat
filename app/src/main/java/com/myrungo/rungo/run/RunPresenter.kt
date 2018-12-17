@@ -254,7 +254,11 @@ class RunPresenter @Inject constructor(
             .subscribe({}, { Timber.e(it) })
             .connect()
 
-        router.newRootScreen(Screens.ChallengeDone)
+        if (isItChallenge) {
+            router.newRootScreen(Screens.ChallengeDone)
+        } else {
+            router.newRootScreen(Screens.TrainigDone)
+        }
     }
 
     private fun saveTotalDistanceToDB() {

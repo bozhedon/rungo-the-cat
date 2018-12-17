@@ -1,5 +1,6 @@
 package com.myrungo.rungo
 
+import android.support.v4.app.Fragment
 import com.myrungo.rungo.auth.AuthFlowFragment
 import com.myrungo.rungo.auth.AuthFragment
 import com.myrungo.rungo.auth.welcome.WelcomeFragment
@@ -13,6 +14,7 @@ import com.myrungo.rungo.main.MainFlowFragment
 import com.myrungo.rungo.profile.ProfileFragment
 import com.myrungo.rungo.run.RunFlowFragment
 import com.myrungo.rungo.run.RunFragment
+import com.myrungo.rungo.training.TrainingDoneFragment
 import ru.terrakok.cicerone.android.support.SupportAppScreen
 
 object Screens {
@@ -51,6 +53,10 @@ object Screens {
 
     object ChallengeDone : SupportAppScreen() {
         override fun getFragment() = ChallengeDoneFragment()
+    }
+
+    object TrainigDone : SupportAppScreen() {
+        override fun getFragment() = TrainingDoneFragment()
     }
 
     data class CustomizeDone(val skinRes: Int) : SupportAppScreen() {
